@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIDECOR - 가구 스캐치</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        :root {
+            --gradient-primary: linear-gradient(135deg, #6366F1, #A855F7);
+        }
+
+        .gradient-text {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .canvas-bg {
+            background: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-bg::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 1px 1px, #6366F1 1px, transparent 0),
+                radial-gradient(circle at 1px 1px, #A855F7 1px, transparent 0);
+            background-size: 30px 30px, 50px 50px;
+            background-position: 0 0, 15px 15px;
+            opacity: 0.1;
+        }
+
+        .tool-button {
+            transition: all 0.3s ease;
+        }
+
+        .tool-button:hover {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .upload-area {
+            border: 2px dashed #6366F1;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: #A855F7;
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(white, white) padding-box,
+                        var(--gradient-primary) border-box;
+            border: 2px solid transparent;
+        }
+
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="fixed w-full z-50 glass-effect">
+        <div class="container mx-auto px-6">
+            <nav class="flex items-center justify-between h-20">
+                <a href="#" class="text-2xl font-bold gradient-text tracking-tight">AIDECOR</a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Gallery</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Features</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Support</a>
+                    <a href="#" class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-all">
+                        Sign In
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-24">
+        <div class="container mx-auto px-6">
+            <!-- Title Section -->
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h1 class="text-6xl font-bold mb-6">
+                    <span class="gradient-text">꿈의 가구</span>
+                    스케치하기
+                </h1>
+                <p class="text-xl text-gray-600">
+                    스케치부터 시작하는 혁신적인 가구 디자인, AI와 함께 당신만의 작품을 만들어보세요.
+                </p>
+            </div>
+
+            <!-- Main Workspace -->
+            <div class="grid lg:grid-cols-12 gap-8 mb-16">
+                <!-- Tools Panel -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">Drawing Tools</h3>
+                        <div class="space-y-4">
+                            <button class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                </svg>
+                                <span>연필</span>
+                            </button>
+                            <button class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                <span>지우개</span>
+                            </button>
+                            <button class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                <span>초기화</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">Properties</h3>
+                        <br>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-2">크기</label>
+                                <input type="range" class="w-full accent-indigo-600" min="1" max="100">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-2">투명도</label>
+                                <input type="range" class="w-full accent-indigo-600" min="1" max="100">
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas Area -->
+                <div class="lg:col-span-8">
+                    <div class="canvas-bg rounded-3xl p-8 shadow-lg">
+                        <canvas id="sketchCanvas" width="1200" height="705" class="w-full gradient-border rounded-2xl bg-white">
+                        </canvas>
+                    </div>
+                </div>
+
+                <!-- Right Panel -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">Upload</h3>
+                        <div class="upload-area rounded-2xl p-6 text-center">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <p class="text-sm text-gray-600 mb-4">Drag & Drop<br>or</p>
+                            <button class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-all">
+                                파일 찾기
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">Reference</h3>
+                        <div class="space-y-4">
+                            <img src="img/Reference.jpg" alt="Reference" class="rounded-xl w-full">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="flex justify-between items-center">
+                <div class="flex space-x-6">
+                    <button class="bg-white text-gray-700 px-6 py-3 rounded-full hover:bg-gray-50 shadow-lg transition-all flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                        </svg>
+                        <span>저장하기</span>
+                    </button>
+                    <button class="bg-white text-gray-700 px-6 py-3 rounded-full hover:bg-gray-50 shadow-lg transition-all flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        <span>공유하기</span>
+                    </button>
+                </div>
+                <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center space-x-2">
+                    <span>AI 디자인 생성</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

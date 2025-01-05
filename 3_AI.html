@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIDECOR - AI 디자인 결과</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        :root {
+            --gradient-primary: linear-gradient(135deg, #6366F1, #A855F7);
+        }
+
+        .gradient-text {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .canvas-bg {
+            background: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-bg::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 1px 1px, #6366F1 1px, transparent 0),
+                radial-gradient(circle at 1px 1px, #A855F7 1px, transparent 0);
+            background-size: 30px 30px, 50px 50px;
+            background-position: 0 0, 15px 15px;
+            opacity: 0.1;
+        }
+
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(white, white) padding-box,
+                        var(--gradient-primary) border-box;
+            border: 2px solid transparent;
+        }
+
+        .style-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .style-card:hover {
+            border-image: linear-gradient(135deg, #6366F1, #A855F7) 1;
+            transform: translateY(-2px);
+        }
+
+        .tool-button {
+            transition: all 0.3s ease;
+        }
+
+        .tool-button:hover {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="fixed w-full z-50 glass-effect">
+        <div class="container mx-auto px-6">
+            <nav class="flex items-center justify-between h-20">
+                <a href="#" class="text-2xl font-bold gradient-text tracking-tight">AIDECOR</a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Gallery</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Features</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Support</a>
+                    <a href="#" class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-all">
+                        Sign In
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-24">
+        <div class="container mx-auto px-6">
+            <!-- Title Section -->
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h1 class="text-6xl font-bold mb-6">
+                    AI가 생성한
+                    <span class="gradient-text">디자인 결과</span>
+                </h1>
+                <p class="text-xl text-gray-600">
+                    AI가 스케치를 기반으로 제작한 가구 디자인을 확인하고 수정하세요.
+                </p>
+            </div>
+
+            <!-- Main Workspace -->
+            <div class="grid lg:grid-cols-12 gap-8 mb-16">
+                <!-- Style Panel -->
+                <div class="lg:col-span-3 space-y-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">Styles</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                                <div class="w-full h-24 bg-white rounded-lg mb-2 gradient-border"></div>
+                                <p class="text-sm font-medium">모던</p>
+                            </div>
+                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                                <div class="w-full h-24 bg-white rounded-lg mb-2 gradient-border"></div>
+                                <p class="text-sm font-medium">클래식</p>
+                            </div>
+                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                                <div class="w-full h-24 bg-white rounded-lg mb-2 gradient-border"></div>
+                                <p class="text-sm font-medium">미니멀</p>
+                            </div>
+                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                                <div class="w-full h-24 bg-white rounded-lg mb-2 gradient-border"></div>
+                                <p class="text-sm font-medium">북유럽</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">Materials</h3>
+                        <div class="space-y-4">
+                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 rounded-lg gradient-border bg-white"></div>
+                                    <div>
+                                        <p class="font-medium">원목</p>
+                                        <p class="text-sm text-gray-500">자연스러운 나무 질감</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 rounded-lg gradient-border bg-white"></div>
+                                    <div>
+                                        <p class="font-medium">메탈</p>
+                                        <p class="text-sm text-gray-500">현대적인 금속 마감</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 rounded-lg gradient-border bg-white"></div>
+                                    <div>
+                                        <p class="font-medium">패브릭</p>
+                                        <p class="text-sm text-gray-500">부드러운 천 소재</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Area -->
+                <div class="lg:col-span-6">
+                    <div class="canvas-bg rounded-3xl p-8 shadow-lg">
+                        <div class="gradient-border rounded-2xl bg-white p-4">
+                            <br>
+                            <img src="img/Design Preview.jpeg" alt="Design Preview" class="rounded-xl w-full">
+                            <div class="flex justify-between items-center mt-4">
+                                <div>
+                                    <h3 class="font-semibold text-lg">현재 버전: v1.2</h3>
+                                    <p class="text-gray-500 text-sm">최종 수정: 2024.01.05</p>
+                                </div>
+                                <div class="flex space-x-3">
+                                    <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls Panel -->
+                <div class="lg:col-span-3 space-y-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">Design Feedback</h3>
+                        <textarea 
+                            class="w-full h-32 p-4 rounded-xl border-2 gradient-border focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                            placeholder="수정사항을 자세히 설명해주세요..."></textarea>
+                        <button class="mt-4 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:opacity-90 transition-all">
+                            수정 요청하기
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">Saved Version</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 rounded-xl border-2 border-gray-100 hover:border-indigo-500 transition-all cursor-pointer">
+                                <div class="flex justify-between items-center mb-2">
+                                    <p class="font-medium">버전 1.2</p>
+                                    <p class="text-sm text-gray-500">2024.01.05</p>
+                                </div>
+                                <p class="text-sm text-gray-600">초기 디자인 수정</p>
+                            </div>
+                            <div class="p-4 rounded-xl border-2 border-gray-100 hover:border-indigo-500 transition-all cursor-pointer">
+                                <div class="flex justify-between items-center mb-2">
+                                    <p class="font-medium">버전 1.1</p>
+                                    <p class="text-sm text-gray-500">2024.01.04</p>
+                                </div>
+                                <p class="text-sm text-gray-600">재질 변경 및 크기 조정</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">3D Rendering</h3>
+                        <button class="tool-button w-full gradient-border rounded-xl p-4 text-left hover:bg-gray-50 transition-all group">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium mb-1">렌더링 시작하기</p>
+                                    <p class="text-sm text-gray-500">약 2-3분 소요됩니다</p>
+                                </div>
+                                <svg class="w-6 h-6 text-indigo-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                </svg>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

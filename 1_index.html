@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIDECOR - AI 가구 디자인</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-primary: linear-gradient(135deg, #6366F1, #A855F7);
+            --gradient-secondary: linear-gradient(135deg, #EEF2FF, #F5F3FF);
+        }
+
+        * {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .gradient-text {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-pattern {
+            background: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-pattern::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 1px 1px, #6366F1 1px, transparent 0),
+                radial-gradient(circle at 1px 1px, #A855F7 1px, transparent 0);
+            background-size: 30px 30px, 50px 50px;
+            background-position: 0 0, 15px 15px;
+            opacity: 0.1;
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(white, white) padding-box,
+                        var(--gradient-primary) border-box;
+            border: 2px solid transparent;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(40px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="fixed w-full z-50 glass-effect">
+        <div class="container mx-auto px-6">
+            <nav class="flex items-center justify-between h-20">
+                <a href="#" class="text-2xl font-bold gradient-text tracking-tight">AIDECOR</a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Gallery</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Features</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Community</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Support</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Login</a>
+                    <a href="#" class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-all">
+                        Start Free
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-24 hero-pattern min-h-screen flex items-center">
+        <div class="container mx-auto px-6 relative">
+            <div class="blob bg-indigo-300 w-96 h-96 top-0 left-0"></div>
+            <div class="blob bg-purple-300 w-96 h-96 bottom-0 right-0"></div>
+            <div class="grid lg:grid-cols-2 gap-16 items-center relative">
+                <div class="space-y-8">
+                    <h1 class="text-7xl font-bold leading-tight tracking-tight">
+                        Design Your Dream
+                        <span class="gradient-text">Furniture</span>
+                        with AI
+                    </h1>
+                    <p class="text-xl text-gray-600 leading-relaxed">
+                        AI의 혁신적인 기술로 당신만의 독특한 가구를 디자인하세요.<br>
+                        스케치부터 3D 모델링까지, 새로운 창작의 여정이 시작됩니다.
+                    </p>
+                    <div class="flex flex-wrap gap-6">
+                        <button class="bg-indigo-600 text-white px-8 py-4 rounded-full hover:bg-indigo-700 transition-all transform hover:scale-105">
+                            시작하기
+                        </button>
+                        <button class="gradient-border rounded-full px-8 py-4 text-indigo-600 hover:bg-gray-50 transition-all">
+                            데모 보기
+                        </button>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-3xl filter blur-3xl"></div>
+                    <img src="img\AI Furniture Design.png" alt="AI Furniture Design" class="relative rounded-3xl shadow-2xl floating">
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Features Section -->
+    <section class="py-32 bg-white relative overflow-hidden">
+        <div class="container mx-auto px-6">
+            <div class="text-center max-w-3xl mx-auto mb-20">
+                <h2 class="text-5xl font-bold mb-6">How It Works</h2>
+                <p class="text-xl text-gray-600 leading-relaxed">
+                    AI와 함께하는 혁신적인 디자인 프로세스를 경험하세요.<br>
+                    당신의 아이디어가 실제 가구로 탄생하는 순간을 목격하세요.
+                </p>
+            </div>
+            <div class="feature-grid">
+                <div class="card-hover bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center text-2xl font-bold text-white mb-6">
+                        1
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Ideation</h3>
+                    <p class="text-gray-600">자유롭게 아이디어를 스케치하고 영감을 얻으세요. AI가 당신의 생각을 이해하고 발전시킵니다.</p>
+                </div>
+                <div class="card-hover bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center text-2xl font-bold text-white mb-6">
+                        2
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">AI Enhancement</h3>
+                    <p class="text-gray-600">AI가 당신의 스케치를 분석하고 전문적인 디자인으로 변환합니다. 실시간으로 수정이 가능합니다.</p>
+                </div>
+                <div class="card-hover bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center text-2xl font-bold text-white mb-6">
+                        3
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">3D Preview</h3>
+                    <p class="text-gray-600">완성된 디자인을 3D로 확인하고 실제 공간에 배치해보세요. 다양한 각도에서 검토가 가능합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="py-32 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="space-y-8">
+                    <h2 class="text-5xl font-bold leading-tight">Create Without Limits</h2>
+                    <p class="text-xl text-gray-600">
+                        AI가 당신의 창의력을 증폭시킵니다. 전문적인 디자인 지식이 없어도
+                        누구나 아름다운 가구를 만들 수 있습니다.
+                    </p>
+                    <div class="grid grid-cols-1 gap-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold">실시간 AI 지원</h3>
+                                <p class="text-gray-600">디자인 과정에서 즉각적인 피드백과 제안을 받아보세요.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-2xl bg-purple-100 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold">전문가급 렌더링</h3>
+                                <p class="text-gray-600">포토리얼리스틱한 3D 렌더링으로 완성도를 높이세요.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <img src="img\Furniture Sketch.png" alt="Furniture Sketch" class="rounded-3xl shadow-xl">
+                    <img src="img\Furniture Design.jpeg" alt="Furniture Design" class="rounded-3xl shadow-xl mt-16">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-32 bg-gradient-to-br from-indigo-600 to-purple-600 relative overflow-hidden">
+        <div class="container mx-auto px-6 relative">
+            <div class="max-w-3xl mx-auto text-center text-white">
+                <h2 class="text-5xl font-bold mb-8">Start Creating Today</h2>
+                <p class="text-xl mb-12 opacity-90">
+                    AIDECOR와 함께, AI로 디자인한 3D 가구를 보고, 나만의 가구를 추천받아보세요.<br>
+                    신용카드 없이 무료로 시작할 수 있습니다.
+                </p>
+                <button class="bg-white text-indigo-600 px-12 py-5 rounded-full text-xl font-bold hover:bg-gray-50 transition-all transform hover:scale-105">
+                    무료로 시작하기
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-20">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-12">
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold gradient-text">AIDECOR</h3>
+                    <p class="text-gray-400">AI로 혁신하는 가구 디자인의 새로운 시대를 만들어갑니다.</p>
+                    <div class="flex space-x-4 mt-6">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Company</h4>
+                    <ul class="space-y-4 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Press</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Partners</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Resources</h4>
+                    <ul class="space-y-4 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Community</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Contact</h4>
+                    <ul class="space-y-4 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Support</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Sales</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Media</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Office</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">&copy; 2025 AIDECOR. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
