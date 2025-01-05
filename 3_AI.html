@@ -181,7 +181,7 @@
                     <div class="canvas-bg rounded-3xl p-8 shadow-lg">
                         <div class="gradient-border rounded-2xl bg-white p-4">
                             <br>
-                            <img src="img/Design Preview.jpeg" alt="Design Preview" class="rounded-xl w-full">
+                            <img src="./img/DesignPreview.jpeg" alt="Design Preview" class="rounded-xl w-full">
                             <div class="flex justify-between items-center mt-4">
                                 <div>
                                     <h3 class="font-semibold text-lg">현재 버전: v1.2</h3>
@@ -238,7 +238,13 @@
 
                     <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                         <h3 class="text-lg font-bold mb-6 gradient-text">3D Rendering</h3>
-                        <button class="tool-button w-full gradient-border rounded-xl p-4 text-left hover:bg-gray-50 transition-all group">
+                        <button onclick="goToPage()"  class="tool-button w-full gradient-border rounded-xl p-4 text-left hover:bg-gray-50 transition-all group">
+                            <script>
+                                function goToPage() {
+                                    // 2.html로 이동
+                                    window.location.href = "4_3D.html";
+                                }
+                            </script>
                             <div class="flex justify-between items-center">
                                 <div>
                                     <p class="font-medium mb-1">렌더링 시작하기</p>

@@ -124,9 +124,15 @@
                         스케치부터 3D 모델링까지, 새로운 창작의 여정이 시작됩니다.
                     </p>
                     <div class="flex flex-wrap gap-6">
-                        <button class="bg-indigo-600 text-white px-8 py-4 rounded-full hover:bg-indigo-700 transition-all transform hover:scale-105">
+                        <button onclick="goToPage()" class="bg-indigo-600 text-white px-8 py-4 rounded-full hover:bg-indigo-700 transition-all transform hover:scale-105">
                             시작하기
                         </button>
+                        <script>
+                            function goToPage() {
+                                // 2.html로 이동
+                                window.location.href = "2_sketch.html";
+                            }
+                        </script>
                         <button class="gradient-border rounded-full px-8 py-4 text-indigo-600 hover:bg-gray-50 transition-all">
                             데모 보기
                         </button>
@@ -134,7 +140,7 @@
                 </div>
                 <div class="relative">
                     <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-3xl filter blur-3xl"></div>
-                    <img src="img\AI Furniture Design.png" alt="AI Furniture Design" class="relative rounded-3xl shadow-2xl floating">
+                    <img src="./img/AIFurnitureDesign.png" alt="AI Furniture Design" class="relative rounded-3xl shadow-2xl floating">
                 </div>
             </div>
         </div>
@@ -213,8 +219,8 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-8">
-                    <img src="img\Furniture Sketch.png" alt="Furniture Sketch" class="rounded-3xl shadow-xl">
-                    <img src="img\Furniture Design.jpeg" alt="Furniture Design" class="rounded-3xl shadow-xl mt-16">
+                    <img src="./img/FurnitureSketch.png" alt="Furniture Sketch" class="rounded-3xl shadow-xl">
+                    <img src="./img/FurnitureDesign.jpeg" alt="Furniture Design" class="rounded-3xl shadow-xl mt-16">
                 </div>
             </div>
         </div>

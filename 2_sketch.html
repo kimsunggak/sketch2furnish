@@ -187,7 +187,7 @@
                     <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                         <h3 class="text-lg font-bold mb-6 gradient-text">Reference</h3>
                         <div class="space-y-4">
-                            <img src="img/Reference.jpg" alt="Reference" class="rounded-xl w-full">
+                            <img src="./img/Reference.jpg" alt="Reference" class="rounded-xl w-full">
                         </div>
                     </div>
                 </div>
@@ -209,8 +209,14 @@
                         <span>공유하기</span>
                     </button>
                 </div>
-                <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center space-x-2">
+                <button onclick="goToPage()"  class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center space-x-2">
                     <span>AI 디자인 생성</span>
+                    <script>
+                        function goToPage() {
+                            // 2.html로 이동
+                            window.location.href = "3_AI.html";
+                        }
+                    </script
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                     </svg>
