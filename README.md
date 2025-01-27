@@ -1,109 +1,84 @@
-첨부된 이미지들을 바탕으로 더 상세한 README를 작성해드리겠습니다.
+# AIDecor_ikors
+> AI 기술을 활용한 스마트 가구 디자인 솔루션
 
-# 🏠 AIDecor_ikors
+<br>
 
-## 📝 프로젝트 소개
-AIDecor는 AI 기술을 활용한 혁신적인 가구 디자인 솔루션입니다. 사용자의 공간, 취향, 선호도를 반영하여 맞춤형 가구 디자인을 제안하는 웹 애플리케이션으로, 'Design Your Dream Furniture with AI'를 모토로 개발되었습니다.
+## 🎯 Overview
+`AIDecor`는 AI 기술을 활용하여 사용자 맞춤형 가구 디자인을 제안하는 웹 애플리케이션입니다. 직관적인 인터페이스와 고도화된 AI 알고리즘을 통해 누구나 쉽게 자신만의 가구를 디자인할 수 있습니다.
 
-## 🎯 프로젝트 목표
-- AI 기술을 통한 개인화된 인테리어 추천 시스템 개발
-- 사용자 경험을 극대화하는 직관적인 인터페이스 구현
-- 다양한 가구 스타일과 공간 유형에 대한 디자인 솔루션 제공
-- 2D/3D 변환 기술을 활용한 실감형 가구 디자인 제공
+<br>
 
-## 🛠 기술 스택
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
+## ⚙️ Tech Stack
+```
+Frontend: HTML5 | CSS3 | JavaScript
+AI Model: CNN | Pix2Pix
+Design Tool: Figma
+Version Control: Git
+```
 
-## 💡 개발 프로세스
-### 1. 2D 이미지 생성 과정
-- **데이터 수집**
-  - 실제 가구 이미지 수집
-  - 디테일 데이터셋 구축
-  - 모델 학습을 위한 전처리
-  
-- **이미지 변환**
-  - 스케치 이미지 변환
-  - 스타일 적용
-  - 고품질 2D 이미지 출력
+<br>
 
-### 2. 3D 변환 가능성
-1. 모델 처리
-   - 메쉬 생성
-   - 3D 모델 추출
-   
-2. 3D 모델링
-   - 텍스처 매핑
-   - 렌더링 최적화
-   
-3. 텍스처 매핑
-   - UV 매핑
-   - 텍스처 적용
-   
-4. 최종 출력
-   - 품질 검사
-   - 최종 3D 모델
+## 🔍 Core Features
 
-## ✨ 주요 기능
-### 1. 간단한 그림 도구
-- CNN 모델 사용
-- 가구 특징 인식
-- 패턴 생성 기능
+### 1. Smart Design Assistant
+- AI 기반 디자인 추천 시스템
+- 실시간 스타일 변환
+- 맞춤형 가구 디자인 제안
 
-### 2. 직관적인 UI
-- 사용자 중심 디자인
-- drag-and-drop 기능 구현
-- 실시간 피드백 시스템
+### 2. Interactive UI/UX
+- 직관적인 스케치 도구
+- 드래그 앤 드롭 인터페이스
+- 실시간 미리보기 기능
 
-### 3. 사용자 중심 설계
-- 사용자 친화적 메뉴
-- 단계별 가이드 제공
-- 커스터마이징 옵션
+### 3. 3D Transformation
+- 2D 스케치 → 3D 모델 변환
+- 텍스처 매핑 및 렌더링
+- 다각도 뷰어 제공
 
-## 🔄 시스템 구조
-- **간단한 그림 도구**
-  - 스케치 기능
-  - 도구 선택 메뉴
-  - 가이드라인 제공
-  
-- **최적화 프로세스**
-  - 실시간 이미지 처리
-  - 성능 최적화
-  - 디자인 피드백
-  
-- **사용자 경험**
-  - 직관적 UI/UX
-  - 빠른 응답 속도
-  - 학습된 모델 적용
+<br>
 
-## 🚀 시작하기
+## 🛠️ Development Process
+
+### Phase 1: 2D Image Generation
+```mermaid
+graph LR
+A[데이터 수집] --> B[전처리]
+B --> C[모델 학습]
+C --> D[이미지 생성]
+D --> E[품질 검증]
+```
+
+### Phase 2: 3D Conversion
+```mermaid
+graph LR
+A[메쉬 생성] --> B[3D 모델링]
+B --> C[텍스처 매핑]
+C --> D[최종 렌더링]
+```
+
+<br>
+
+## 🚀 Getting Started
+
 ```bash
-# 저장소 클론
+# Repository Clone
 git clone https://github.com/chaaaaae/AIDecor_ikors.git
 
-# 프로젝트 디렉토리로 이동
+# Move to Project Directory
 cd AIDecor_ikors
 ```
 
-## 📱 화면 구성
-1. 메인 페이지
-   - 직관적인 디자인 인터페이스
-   - 간편한 네비게이션
-   
-2. 스케치 도구
-   - 다양한 그리기 도구
-   - 실시간 미리보기
-   
-3. 3D 변환 뷰어
-   - 실시간 3D 렌더링
-   - 다각도 확인 기능
+<br>
 
-## 👥 개발자
+## 👥 Developer
 [@chaaaaae](https://github.com/chaaaaae)
 
-## 📄 라이센스
-오픈소스
+<br>
 
-## 📞 문의사항
-프로젝트에 관한 문의사항이나 제안사항이 있으시다면 이슈를 등록해 주세요.
+## 📜 License
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+<br>
+
+---
+*AIDecor_ikors는 더 나은 인테리어 경험을 위해 계속 발전하고 있습니다* 🏠✨
