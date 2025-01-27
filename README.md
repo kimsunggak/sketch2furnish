@@ -81,4 +81,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 <br>
 
 ---
-*AIDecor_ikors는 더 나은 인테리어 경험을 위해 계속 발전하고 있습니다* 🏠✨
+*AIDecor_ikors는 더 나은 인테리어 경험을 위해 계속 발전하고 있습니다* 🏠✨ 
