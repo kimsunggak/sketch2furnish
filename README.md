@@ -1,4 +1,4 @@
-# AIDecor_ikors
+# 🛋️ AIDecor
 > AI 기술을 활용한 스마트 가구 디자인 솔루션
 
 <br>
