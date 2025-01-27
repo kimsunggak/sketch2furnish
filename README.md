@@ -44,10 +44,7 @@ cd AIDecor_ikors
 ```
 
 ## 👥 개발자
-   - 김나연
-   - 김성각
-   - 박채현 [@chaaaaae](https://github.com/chaaaaae)
-   - 성태환
+[@chaaaaae](https://github.com/chaaaaae)
 
 ## 📄 라이센스
 오픈소스
