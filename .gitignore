@@ -13,7 +13,7 @@ build/
 dist/
 checkpoints/
 results/
-datasets/
+
 wandb/
 
 *.png
