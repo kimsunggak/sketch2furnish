@@ -2,7 +2,7 @@
 > **스케치(2D) → 가구 이미지/3D 변환 & 유사 가구 추천 웹 서비스**
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/0000000/illustration.jpg" width="400px" alt="Sketch to Furniture"/>
+  <img src="./banner.png" width="400" alt="프로젝트 배너" />
 </p>
 
 ---
