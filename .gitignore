@@ -49,7 +49,7 @@ test/data/gpu_tensors.pt
 test/data/legacy_serialized.pt
 test/htmlcov
 test/.coverage
-
+docs/
 # -----------------------------
 # Python 관련 (캐시, 빌드, 가상환경 등)
 # -----------------------------
