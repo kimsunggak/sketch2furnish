@@ -1,48 +1,82 @@
+# -----------------------------
+# OS & 편집기 관련
+# -----------------------------
+.DS_Store
+*~
+.idea/
+
+# -----------------------------
+# 일반 빌드 산출물 / 임시파일
+# -----------------------------
+debug*
+build/
+dist/
 checkpoints/
+results/
+datasets/
+wandb/
 
+*.png
 
+# -----------------------------
+# Torch 관련
+# -----------------------------
+torch.egg-info/
+torch/version.py
+torch/csrc/generic/TensorMethods.cpp
+torch/lib/*.so*
+torch/lib/*.dylib*
+torch/lib/*.h
+torch/lib/build
+torch/lib/tmp_install
+torch/lib/include
+torch/lib/torch_shm_manager
+torch/csrc/cudnn/cuDNN.cpp
+torch/csrc/nn/THNN.cwrap
+torch/csrc/nn/THNN.cpp
+torch/csrc/nn/THCUNN.cwrap
+torch/csrc/nn/THCUNN.cpp
+torch/csrc/nn/THNN_generic.cwrap
+torch/csrc/nn/THNN_generic.cpp
+torch/csrc/nn/THNN_generic.h
 
+# -----------------------------
+# 문서 & 테스트 산출물
+# -----------------------------
+docs/src/**/*
+test/data/legacy_modules.t7
+test/data/gpu_tensors.pt
+test/data/legacy_serialized.pt
+test/htmlcov
+test/.coverage
 
-# Byte-compiled / optimized / DLL files
+# -----------------------------
+# Python 관련 (캐시, 빌드, 가상환경 등)
+# -----------------------------
+
+# Byte-compiled / optimized
 __pycache__/
+**/__pycache__/
 *.py[cod]
-*$py.class
+**/*.pyc
+**/**/*.pyc
+**/**/**/*.pyc
 
 # C extensions
 *.so
+*.so.*
+*.dylib*
 
 # Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
+*.egg
 *.egg-info/
 .installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
-
-# Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
-htmlcov/
+# Unit test / coverage
 .tox/
 .nox/
 .coverage
@@ -54,83 +88,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
-cover/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-.pybuilder/
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# UV
-#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#uv.lock
-
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
-
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#pdm.lock
-#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
-#   in version control.
-#   https://pdm.fming.dev/latest/usage/project/#working-with-version-control
-.pdm.toml
-.pdm-python
-.pdm-build/
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
+htmlcov/
 
 # Environments
 .env
@@ -141,36 +99,34 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
-.spyderproject
-.spyproject
+# PyInstaller
+# (If used)
+# *.spec
 
-# Rope project settings
-.ropeproject
+# Jupyter
+.ipynb_checkpoints
 
-# mkdocs documentation
-/site
+# Django / Flask 등
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+instance/
+.webassets-cache
+*.log
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+# -----------------------------
+# 파이썬 의존성/관리 툴
+# -----------------------------
+.pdm.toml
+.pdm-python
+.pdm-build/
+pdm.lock
 
-# Pyre type checker
-.pyre/
+# Pipenv
+# Pipfile.lock
 
-# pytype static type analyzer
-.pytype/
+# Poetry
+# poetry.lock
 
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
-
-# PyPI configuration file
-.pypirc
+# UV
+# uv.lock
