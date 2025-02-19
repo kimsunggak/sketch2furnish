@@ -12,7 +12,7 @@
 
 ---
 
-## **모델 다운로드 가이드**
+## **모델 & 데이터셋 다운로드 가이드**
 
 1. **`gdwon` 라이브러리 설치** (없을 경우)
    ```bash
@@ -20,8 +20,12 @@
 
 2. **스크립트 실행 권한 부여**
    ```bash
-   chmod +x download_pix2pix_model.sh
+   chmod +x download_pix2pix_resources.sh
 
-3. **모델 다운로드 실행**
-    ```bash
-    ./download_pix2pix_model.sh facades_furniture_pix2pix
+3. **모델 다운로드**
+   ```bash
+   ./download_pix2pix_resources.sh facades_furniture_pix2pix
+
+4. **데이터셋 다운로드**
+   ```bash
+   ./download_pix2pix_resources.sh f_dataset
