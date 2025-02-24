@@ -3,35 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIDECOR - 3D 렌더링 및 추천</title>
+    <title>가꿈 - 3D 렌더링 및 추천</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             font-family: 'Space Grotesk', sans-serif;
         }
-
         :root {
             --gradient-primary: linear-gradient(135deg, #6366F1, #A855F7);
         }
-
         .gradient-text {
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .glass-effect {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .card-hover {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .card-hover:hover {
             transform: translateY(-8px);
             box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
@@ -43,7 +38,7 @@
     <header class="fixed w-full z-50 glass-effect">
         <div class="container mx-auto px-6">
             <nav class="flex items-center justify-between h-20">
-                <a href="#" class="text-2xl font-bold gradient-text tracking-tight">AIDECOR</a>
+                <a href="#" class="text-2xl font-bold gradient-text tracking-tight">가꿈</a>
                 <div class="hidden md:flex space-x-8">
                     <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Gallery</a>
                     <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Features</a>
@@ -56,20 +51,20 @@
         </div>
     </header>
 
-        <!-- Main Content -->
-        <main class="pt-32 pb-24">
-            <div class="container mx-auto px-6">
-                <!-- Title Section -->
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <h1 class="text-6xl font-bold mb-6">
-                        <span class="gradient-text">3D 렌더링</span>
-                        및
-                        <span class="gradient-text">추천</span>
-                    </h1>
-                    <p class="text-xl text-gray-600">
-                        입력된 디자인으로 생성된 3D 모델을 확인하고, 추천 제품을 만나보세요.
-                    </p>
-                </div>
+    <!-- Main Content -->
+    <main class="pt-32 pb-24">
+        <div class="container mx-auto px-6">
+            <!-- Title Section -->
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h1 class="text-6xl font-bold mb-6">
+                    <span class="gradient-text">3D 렌더링</span>
+                    및
+                    <span class="gradient-text">추천</span>
+                </h1>
+                <p class="text-xl text-gray-600">
+                    입력된 디자인으로 생성된 3D 모델을 확인하고, 추천 제품을 만나보세요.
+                </p>
+            </div>
 
             <!-- 3D Viewer Section -->
             <section class="mb-16">
@@ -79,6 +74,7 @@
                         <div class="text-center mb-6">
                             <h3 class="text-xl font-bold gradient-text">3D Model Preview</h3>
                         </div>
+                        <!-- 3D 모델을 보여주는 캔버스 (id="viewerCanvas") -->
                         <canvas id="viewerCanvas" class="w-full h-96 bg-gray-200 rounded-xl"></canvas>
                         <div class="flex justify-between items-center mt-6">
                             <button class="bg-gray-50 text-gray-700 px-4 py-2 rounded-lg shadow hover:bg-gray-100">회전 ↩</button>
@@ -120,20 +116,19 @@
                                 <p class="text-sm text-gray-500">₩ 가격 | 브랜드 4</p>
                             </div>
                         </div>                        
-                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Bottom Section -->
+            <!-- Bottom Section: 프로젝트 저장 & 공유 -->
             <div class="flex justify-center items-center space-x-6 mt-8">
-                <button class="bg-white text-gray-700 px-6 py-3 rounded-full hover:bg-gray-50 shadow-lg transition-all flex items-center space-x-2">
+                <button id="saveProjectButton" class="bg-white text-gray-700 px-6 py-3 rounded-full hover:bg-gray-50 shadow-lg transition-all flex items-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
                     </svg>
                     <span>프로젝트 저장</span>
                 </button>
-                <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-full shadow-lg transition-all flex items-center space-x-2">
+                <button id="shareProjectButton" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-full shadow-lg transition-all flex items-center space-x-2">
                     <span>프로젝트 공유</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
@@ -142,5 +137,38 @@
             </div>
         </div>
     </main>
+    
+    <!-- JavaScript: 프로젝트 저장 & 공유 기능 구현 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const saveProjectButton = document.getElementById("saveProjectButton");
+            const shareProjectButton = document.getElementById("shareProjectButton");
+            const viewerCanvas = document.getElementById("viewerCanvas");
+            
+            // 프로젝트 저장: viewerCanvas를 PNG 파일로 다운로드
+            saveProjectButton.addEventListener("click", function () {
+                const imageData = viewerCanvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.href = imageData;
+                link.download = "project.png";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+    
+            // 프로젝트 공유: viewerCanvas의 이미지를 클립보드에 복사
+            shareProjectButton.addEventListener("click", async function () {
+                try {
+                    const blob = await new Promise(resolve => viewerCanvas.toBlob(resolve, "image/png"));
+                    const item = new ClipboardItem({ "image/png": blob });
+                    await navigator.clipboard.write([item]);
+                    alert("프로젝트 이미지가 클립보드에 복사되었습니다!");
+                } catch (err) {
+                    console.error("이미지 복사 실패", err);
+                    alert("이미지 복사에 실패했습니다.");
+                }
+            });
+        });
+    </script>
 </body>
 </html>
