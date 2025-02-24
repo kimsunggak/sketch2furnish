@@ -20,12 +20,12 @@
 
 2. **스크립트 실행 권한 부여**
    ```bash
-   chmod +x download_pix2pix_resources.sh
+   chmod +x download_pix2pix.sh
 
 3. **모델 다운로드**
    ```bash
-   ./download_pix2pix_resources.sh facades_furniture_pix2pix
+   ./download_pix2pix.sh furniture_pix2pix
 
 4. **데이터셋 다운로드**
    ```bash
-   ./download_pix2pix_resources.sh f_dataset
+   ./download_pix2pix.sh f_dataset
