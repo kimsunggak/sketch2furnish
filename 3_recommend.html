@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>가꿈 - 3D 렌더링 및 추천</title>
+    <title>가꿈 - 가구 추천</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -38,14 +38,10 @@
     <header class="fixed w-full z-50 glass-effect">
         <div class="container mx-auto px-6">
             <nav class="flex items-center justify-between h-20">
-                <a href="#" class="text-2xl font-bold gradient-text tracking-tight">가꿈</a>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Gallery</a>
-                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Features</a>
-                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Support</a>
-                    <a href="#" class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-all">
-                        Sign In
-                    </a>
+                <!-- 수정: href="#"에서 href="index.html"로 변경 -->
+                <a href="index.html" class="text-2xl font-bold gradient-text tracking-tight">가꿈</a>
+                <div class="hidden md:flex">
+                    <span class="text-gray-700 text-lg">Where Dreams Are Drawn ⁞ 앨리스 AI Spark Camp ⁞ 1조</span>
                 </div>
             </nav>
         </div>
@@ -57,65 +53,73 @@
             <!-- Title Section -->
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <h1 class="text-6xl font-bold mb-6">
-                    <span class="gradient-text">3D 렌더링</span>
+                    <span class="gradient-text">꿈의 가구</span>
                     및
                     <span class="gradient-text">추천</span>
                 </h1>
                 <p class="text-xl text-gray-600">
-                    입력된 디자인으로 생성된 3D 모델을 확인하고, 추천 제품을 만나보세요.
+                    입력된 디자인으로 생성된 당신만의 가구를 확인하고, 추천 제품을 만나보세요.
                 </p>
             </div>
 
-            <!-- 3D Viewer Section -->
+            <!-- Dream Furniture Viewer Section -->
             <section class="mb-16">
                 <div class="grid lg:grid-cols-2 gap-8">
-                    <!-- 3D Viewer -->
-                    <div class="bg-white rounded-3xl p-8 shadow-lg">
+                    <!-- Dream Furniture Viewer -->
+                    <div class="bg-white rounded-3xl p-8 shadow-lg flex flex-col h-full">
                         <div class="text-center mb-6">
-                            <h3 class="text-xl font-bold gradient-text">3D Model Preview</h3>
+                            <h3 class="text-xl font-bold gradient-text">Your Dream Furniture</h3>
                         </div>
-                        <!-- 3D 모델을 보여주는 캔버스 (id="viewerCanvas") -->
-                        <canvas id="viewerCanvas" class="w-full h-96 bg-gray-200 rounded-xl"></canvas>
-                        <div class="flex justify-between items-center mt-6">
-                            <button class="bg-gray-50 text-gray-700 px-4 py-2 rounded-lg shadow hover:bg-gray-100">회전 ↩</button>
-                            <button class="bg-gray-50 text-gray-700 px-4 py-2 rounded-lg shadow hover:bg-gray-100">회전 ↪</button>
-                            <button class="bg-gray-50 text-gray-700 px-4 py-2 rounded-lg shadow hover:bg-gray-100">확대 +</button>
-                            <button class="bg-gray-50 text-gray-700 px-4 py-2 rounded-lg shadow hover:bg-gray-100">축소 -</button>
-                            <button class="bg-gray-50 text-gray-700 px-4 py-2 rounded-lg shadow hover:bg-gray-100">배경 변경</button>
+                        <div class="flex-grow">
+                            <!-- 캔버스가 1:1 비율로 확대되어 나타납니다. -->
+                            <canvas id="viewerCanvas" class="w-full bg-gray-200 rounded-xl" style="aspect-ratio: 1 / 1;"></canvas>
                         </div>
                     </div>
 
                     <!-- Recommended Products -->
-                    <div class="bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="bg-white rounded-3xl p-8 shadow-lg flex flex-col h-full">
                         <div class="text-center mb-6">
                             <h3 class="text-xl font-bold gradient-text">Recommended Products</h3>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <!-- Card 1 -->
-                            <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
-                                <img src="img/Product 1.png" alt="Product 1" class="w-full h-32 object-cover rounded-md mb-4">
-                                <h4 class="font-bold text-gray-700">가구 이름 1</h4>
-                                <p class="text-sm text-gray-500">₩ 가격 | 브랜드 1</p>
+                        <div class="flex-grow">
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Card 1 -->
+                                <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
+                                    <img src="img/Product 1.png" alt="Product 1" class="w-full h-40 object-cover rounded-md mb-4">
+                                    <h4 class="font-bold text-gray-700">가구 이름 1</h4>
+                                    <p class="text-sm text-gray-500">₩ 가격 | 브랜드 1</p>
+                                </div>
+                                <!-- Card 2 -->
+                                <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
+                                    <img src="img/Product 2.png" alt="Product 2" class="w-full h-40 object-cover rounded-md mb-4">
+                                    <h4 class="font-bold text-gray-700">가구 이름 2</h4>
+                                    <p class="text-sm text-gray-500">₩ 가격 | 브랜드 2</p>
+                                </div>
+                                <!-- Card 3 -->
+                                <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
+                                    <img src="img/Product 3.png" alt="Product 3" class="w-full h-40 object-cover rounded-md mb-4">
+                                    <h4 class="font-bold text-gray-700">가구 이름 3</h4>
+                                    <p class="text-sm text-gray-500">₩ 가격 | 브랜드 3</p>
+                                </div>
+                                <!-- Card 4 -->
+                                <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
+                                    <img src="img/Product 4.png" alt="Product 4" class="w-full h-40 object-cover rounded-md mb-4">
+                                    <h4 class="font-bold text-gray-700">가구 이름 4</h4>
+                                    <p class="text-sm text-gray-500">₩ 가격 | 브랜드 4</p>
+                                </div>
+                            </div>                        
+                        </div>
+                        <!-- 가격 범위 설정 UI -->
+                        <div class="mt-6">
+                            <h4 class="text-lg font-bold text-gray-700 mb-2">가격 범위 설정</h4>
+                            <div class="flex items-center space-x-4">
+                                <input type="number" id="minPrice" placeholder="최소 가격" class="w-1/2 px-3 py-2 border rounded-lg focus:outline-none">
+                                <input type="number" id="maxPrice" placeholder="최대 가격" class="w-1/2 px-3 py-2 border rounded-lg focus:outline-none">
                             </div>
-                            <!-- Card 2 -->
-                            <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
-                                <img src="img/Product 2.png" alt="Product 2" class="w-full h-32 object-cover rounded-md mb-4">
-                                <h4 class="font-bold text-gray-700">가구 이름 2</h4>
-                                <p class="text-sm text-gray-500">₩ 가격 | 브랜드 2</p>
-                            </div>
-                            <!-- Card 3 -->
-                            <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
-                                <img src="img/Product 3.png" alt="Product 3" class="w-full h-32 object-cover rounded-md mb-4">
-                                <h4 class="font-bold text-gray-700">가구 이름 3</h4>
-                                <p class="text-sm text-gray-500">₩ 가격 | 브랜드 3</p>
-                            </div>
-                            <!-- Card 4 -->
-                            <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
-                                <img src="img/Product 4.png" alt="Product 4" class="w-full h-32 object-cover rounded-md mb-4">
-                                <h4 class="font-bold text-gray-700">가구 이름 4</h4>
-                                <p class="text-sm text-gray-500">₩ 가격 | 브랜드 4</p>
-                            </div>
-                        </div>                        
+                            <button id="applyPriceFilter" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg shadow hover:bg-indigo-700 transition-all">
+                                가격 필터 적용
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -138,12 +142,13 @@
         </div>
     </main>
     
-    <!-- JavaScript: 프로젝트 저장 & 공유 기능 구현 -->
+    <!-- JavaScript: 프로젝트 저장, 공유 및 가격 필터 기능 구현 -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const saveProjectButton = document.getElementById("saveProjectButton");
             const shareProjectButton = document.getElementById("shareProjectButton");
             const viewerCanvas = document.getElementById("viewerCanvas");
+            const applyPriceFilterButton = document.getElementById("applyPriceFilter");
             
             // 프로젝트 저장: viewerCanvas를 PNG 파일로 다운로드
             saveProjectButton.addEventListener("click", function () {
@@ -167,6 +172,14 @@
                     console.error("이미지 복사 실패", err);
                     alert("이미지 복사에 실패했습니다.");
                 }
+            });
+            
+            // 가격 필터 적용 버튼 이벤트
+            applyPriceFilterButton.addEventListener("click", function() {
+                const minPrice = document.getElementById("minPrice").value;
+                const maxPrice = document.getElementById("maxPrice").value;
+                console.log("가격 필터 적용:", minPrice, maxPrice);
+                // 여기에 가격 필터링 기능 구현 코드를 추가할 수 있습니다.
             });
         });
     </script>

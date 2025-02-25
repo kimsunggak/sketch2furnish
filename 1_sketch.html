@@ -93,13 +93,9 @@
             let drawing = false;
             let erasing = false;
         
-            // 캔버스 크기 자동 조정 (CSS 크기와 실제 픽셀 크기 일치)
-            function resizeCanvas() {
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
-            }
-            resizeCanvas();
-            window.addEventListener("resize", resizeCanvas);
+            // 실제 픽셀 해상도를 256x256으로 고정
+            canvas.width = 256;
+            canvas.height = 256;
         
             ctx.lineCap = "round";
             ctx.strokeStyle = "#000";
@@ -137,6 +133,8 @@
             // 초기화 버튼
             clearBtn.addEventListener("click", function() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // 로컬 스토리지 데이터도 삭제
+                localStorage.removeItem("savedCanvas");
             });
         
             // 크기 조절
@@ -162,11 +160,24 @@
             canvas.addEventListener("mouseup", () => {
                 drawing = false;
                 ctx.closePath();
+                // 캔버스 상태를 로컬 스토리지에 저장
+                const dataUrl = canvas.toDataURL("image/png");
+                localStorage.setItem("savedCanvas", dataUrl);
             });
         
             canvas.addEventListener("mouseleave", () => {
                 drawing = false;
             });
+            
+            // 페이지 로드시 로컬 스토리지에 저장된 캔버스 데이터가 있으면 불러오기
+            const savedDataUrl = localStorage.getItem("savedCanvas");
+            if (savedDataUrl) {
+                const img = new Image();
+                img.onload = function () {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                };
+                img.src = savedDataUrl;
+            }
         });
     </script>
 
@@ -176,14 +187,10 @@
     <header class="fixed w-full z-50 glass-effect">
         <div class="container mx-auto px-6">
             <nav class="flex items-center justify-between h-20">
-                <a href="#" class="text-2xl font-bold gradient-text tracking-tight">가꿈</a>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Gallery</a>
-                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Features</a>
-                    <a href="#" class="text-gray-700 hover:text-indigo-600 transition-colors">Support</a>
-                    <a href="#" class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-all">
-                        Sign In
-                    </a>
+                <!-- 수정: href="#"를 href="index.html"로 변경하여 index 페이지로 이동 -->
+                <a href="index.html" class="text-2xl font-bold gradient-text tracking-tight">가꿈</a>
+                <div class="hidden md:flex">
+                    <span class="text-gray-700 text-lg">Where Dreams Are Drawn ⁞ 앨리스 AI Spark Camp ⁞ 1조</span>
                 </div>
             </nav>
         </div>
@@ -248,13 +255,32 @@
                             <br>
                         </div>
                     </div>
+
+                    <!-- 홈페이지 가기 버튼 (Properties 아래) -->
+                    <button
+                        onclick="goToHomePage()" 
+                        class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-full px-8 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center justify-center space-x-2"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        <span>홈페이지 가기</span>
+                    </button>
                 </div>
 
                 <!-- Canvas Area -->
                 <div class="lg:col-span-8">
                     <div class="canvas-bg rounded-3xl p-8 shadow-lg">
-                        <canvas id="sketchCanvas" width="1200" height="705" class="w-full gradient-border rounded-2xl bg-white">
-                        </canvas>
+                        <!-- gradient-border 래퍼로 캔버스를 감싸고 중앙 정렬 -->
+                        <div class="gradient-border rounded-2xl bg-white p-4 flex justify-center items-center">
+                            <canvas
+                                id="sketchCanvas"
+                                width="256"
+                                height="256"
+                                class="w-full h-auto rounded-xl"
+                                style="max-width: 710px; aspect-ratio: 1 / 1;"
+                            ></canvas>
+                        </div>
                     </div>
                 </div>
 
@@ -281,7 +307,7 @@
                     </div>
 
                     <!-- 저장하기 & 공유하기 버튼 (기능 추가) -->
-                    <div class="flex flex-col space-y-4 mt-4 w-full">
+                    <div class="flex flex-col space-y-4 w-full">
                         <button id="saveButton" class="bg-white text-gray-700 py-3 rounded-2xl shadow-lg transition-all flex items-center justify-center space-x-2 w-full card-hover gradient-border">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
@@ -295,39 +321,30 @@
                             <span>공 유 하 기</span>
                         </button>
                     </div>
+
+                    <!-- AI 디자인 생성 버튼 (공유하기 아래) -->
+                    <button
+                        onclick="goToAIDesign()" 
+                        class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-full px-8 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center justify-center space-x-2"
+                    >
+                        <span>AI 디자인 생성</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
-
-            <!-- Bottom Section -->
-            <div class="flex justify-between items-center">
-                <!-- 홈페이지 가기 버튼 -->
-                <button onclick="goToHomePage()" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center space-x-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    <span>홈페이지 가기</span>
-                </button>
-
-                <!-- AI 디자인 생성 버튼 -->
-                <button onclick="goToAIDesign()" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center space-x-2">
-                    <span>AI 디자인 생성</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- 페이지 이동 -->
-            <script>
-                function goToHomePage() {
-                    window.location.href = "index.html"; // 홈페이지 이동
-                }
-                function goToAIDesign() {
-                    window.location.href = "2_AI.html"; // AI 디자인 페이지 이동
-                }
-            </script>
         </div>
     </main>
+
+    <script>
+        function goToHomePage() {
+            window.location.href = "index.html"; // 홈페이지 이동
+        }
+        function goToAIDesign() {
+            window.location.href = "2_AI.html"; // AI 디자인 페이지 이동
+        }
+    </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -411,6 +428,9 @@
                         const ctx = canvas.getContext("2d");
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        // 파일 업로드 후 캔버스 상태를 로컬 스토리지에 저장
+                        const dataUrl = canvas.toDataURL("image/png");
+                        localStorage.setItem("savedCanvas", dataUrl);
                     };
                     img.src = event.target.result;
                 };
