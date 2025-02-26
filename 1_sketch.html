@@ -302,15 +302,37 @@
                             ></canvas>
                         </div>
                     </div>
+                    
+                    <!-- 레퍼런스 갤러리 추가 (캔버스 아래에 배치) -->
+                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover mt-6">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">References</h3>
+                        <div class="grid grid-cols-5 gap-4">
+                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                                <img src="img/Reference.jpg" alt="Reference 1" class="w-full h-32 object-cover" data-ref="img/Reference.jpg">
+                            </div>
+                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                                <img src="img/Reference2.jpg" alt="Reference 2" class="w-full h-32 object-cover" data-ref="img/Reference2.jpg">
+                            </div>
+                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                                <img src="img/Reference3.jpg" alt="Reference 3" class="w-full h-32 object-cover" data-ref="img/Reference3.jpg">
+                            </div>
+                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                                <img src="img/Reference4.jpg" alt="Reference 4" class="w-full h-32 object-cover" data-ref="img/Reference4.jpg">
+                            </div>
+                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                                <img src="img/Reference5.jpg" alt="Reference 5" class="w-full h-32 object-cover" data-ref="img/Reference5.jpg">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Right Panel -->
+                <!-- Right Panel - 레퍼런스 섹션 제거 -->
                 <div class="lg:col-span-2 space-y-6">
                     <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                         <h3 class="text-lg font-bold mb-6 gradient-text">Upload</h3>
                         <div class="upload-area rounded-2xl p-6 text-center">
                             <svg class="w-12 h-12 mx-auto mb-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 2 0 002-2V6a2 2 2 0 00-2-2H6a2 2 2 0 00-2 2v12a2 2 2 0 002 2z"></path>
                             </svg>
                             <p class="text-sm text-gray-600 mb-4">Drag & Drop<br>or</p>
                             <button class="bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-all">
@@ -319,18 +341,11 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
-                        <h3 class="text-lg font-bold mb-6 gradient-text">Reference</h3>
-                        <div class="space-y-4">
-                            <img src="img/Reference.jpg" alt="Reference" class="rounded-xl w-full">
-                        </div>
-                    </div>
-
-                    <!-- 저장하기 & 공유하기 버튼 (기능 추가) -->
+                    <!-- 저장하기 & 공유하기 버튼 -->
                     <div class="flex flex-col space-y-4 w-full">
                         <button id="saveButton" class="bg-white text-gray-700 py-3 rounded-2xl shadow-lg transition-all flex items-center justify-center space-x-2 w-full card-hover gradient-border">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 2 0 002-2V9a2 2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 2 0 002 2h14a2 2 2 0 002-2V9a2 2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
                             </svg>
                             <span>저 장 하 기</span>
                         </button>
@@ -342,7 +357,7 @@
                         </button>
                     </div>
 
-                    <!-- AI 디자인 생성 버튼 (공유하기 아래) -->
+                    <!-- AI 디자인 생성 버튼 -->
                     <button
                         onclick="goToAIDesign()" 
                         class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-full px-8 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center justify-center space-x-2"
@@ -512,6 +527,39 @@
                     console.error("이미지 복사 실패", err);
                     alert("이미지 복사에 실패했습니다.\n브라우저 설정을 확인해주세요.");
                 }
+            });
+        });
+
+        // 레퍼런스 이미지 클릭 시 캔버스에 적용하는 기능
+        document.addEventListener("DOMContentLoaded", function () {
+            const referenceItems = document.querySelectorAll('.reference-item img');
+            const canvas = document.getElementById("sketchCanvas");
+            const ctx = canvas.getContext("2d");
+            
+            referenceItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const imgSrc = this.getAttribute('data-ref');
+                    
+                    // 이미지 로드 및 캔버스에 그리기
+                    const img = new Image();
+                    img.onload = function() {
+                        // 캔버스 초기화 (검은색 배경)
+                        ctx.fillStyle = "#000000";
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        
+                        // 이미지 캔버스에 그리기 (비율 유지하면서 중앙에 배치)
+                        const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+                        const x = (canvas.width - img.width * scale) / 2;
+                        const y = (canvas.height - img.height * scale) / 2;
+                        
+                        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                        
+                        // 로컬 스토리지에 캔버스 데이터 저장
+                        const dataUrl = canvas.toDataURL("image/png");
+                        localStorage.setItem("savedCanvas", dataUrl);
+                    };
+                    img.src = imgSrc;
+                });
             });
         });
     </script>    
