@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가꿈 - 가구 추천</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        :root {
+            --gradient-primary: linear-gradient(135deg, #6366F1, #A855F7);
+        }
+        .gradient-text {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="fixed w-full z-50 glass-effect">
+        <div class="container mx-auto px-6">
+            <nav class="flex items-center justify-between h-20">
+                <!-- 수정: href="#"에서 href="index.html"로 변경 -->
+                <a href="index.html" class="text-2xl font-bold gradient-text tracking-tight">가꿈</a>
+                <div class="hidden md:flex">
+                    <span class="text-gray-700 text-lg">Where Dreams Are Drawn ⁞ 앨리스 AI Spark Camp ⁞ 1조</span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-24">
+        <div class="container mx-auto px-6">
+            <!-- Title Section -->
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h1 class="text-6xl font-bold mb-6">
+                    <span class="gradient-text">꿈의 가구</span>
+                    및
+                    <span class="gradient-text">추천</span>
+                </h1>
+                <p class="text-xl text-gray-600">
+                    입력된 디자인으로 생성된 당신만의 가구를 확인하고, 추천 제품을 만나보세요.
+                </p>
+            </div>
+
+            <!-- Dream Furniture Viewer Section -->
+            <section class="mb-16">
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Dream Furniture Viewer -->
+                    <div class="bg-white rounded-3xl p-8 shadow-lg flex flex-col h-full">
+                        <div class="text-center mb-6">
+                            <h3 class="text-xl font-bold gradient-text">Your Dream Furniture</h3>
+                        </div>
+                        <div class="flex-grow">
+                            <!-- 캔버스가 1:1 비율로 확대되어 나타납니다. -->
+                            <canvas id="viewerCanvas" class="w-full bg-gray-200 rounded-xl" style="aspect-ratio: 1 / 1;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recommended Products -->
+                    <div class="bg-white rounded-3xl p-8 shadow-lg flex flex-col h-full">
+                        <div class="text-center mb-6">
+                            <h3 class="text-xl font-bold gradient-text">Recommended Products</h3>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Card 1 -->
+                                <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
+                                    <img src="img/Product 1.png" alt="Product 1" class="w-full h-40 object-cover rounded-md mb-4">
+                                    <h4 class="font-bold text-gray-700">가구 이름 1</h4>
+                                    <p class="text-sm text-gray-500">₩ 가격 | 브랜드 1</p>
+                                </div>
+                                <!-- Card 2 -->
+                                <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
+                                    <img src="img/Product 2.png" alt="Product 2" class="w-full h-40 object-cover rounded-md mb-4">
+                                    <h4 class="font-bold text-gray-700">가구 이름 2</h4>
+                                    <p class="text-sm text-gray-500">₩ 가격 | 브랜드 2</p>
+                                </div>
+                                <!-- Card 3 -->
+                                <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
+                                    <img src="img/Product 3.png" alt="Product 3" class="w-full h-40 object-cover rounded-md mb-4">
+                                    <h4 class="font-bold text-gray-700">가구 이름 3</h4>
+                                    <p class="text-sm text-gray-500">₩ 가격 | 브랜드 3</p>
+                                </div>
+                                <!-- Card 4 -->
+                                <div class="bg-gray-50 rounded-xl p-4 shadow card-hover">
+                                    <img src="img/Product 4.png" alt="Product 4" class="w-full h-40 object-cover rounded-md mb-4">
+                                    <h4 class="font-bold text-gray-700">가구 이름 4</h4>
+                                    <p class="text-sm text-gray-500">₩ 가격 | 브랜드 4</p>
+                                </div>
+                            </div>                        
+                        </div>
+                        <!-- 가격 범위 설정 UI -->
+                        <div class="mt-6">
+                            <h4 class="text-lg font-bold text-gray-700 mb-2">가격 범위 설정</h4>
+                            <div class="flex items-center space-x-4">
+                                <input type="number" id="minPrice" placeholder="최소 가격" step="10000" min="0" class="w-1/2 px-3 py-2 border rounded-lg focus:outline-none">
+                                <input type="number" id="maxPrice" placeholder="최대 가격" step="10000" min="0" class="w-1/2 px-3 py-2 border rounded-lg focus:outline-none">
+                            </div>
+                            <button id="applyPriceFilter" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg shadow hover:bg-indigo-700 transition-all">
+                                가격 필터 적용
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom Section: 프로젝트 저장 & 공유 -->
+            <div class="flex justify-center items-center space-x-6 mt-8">
+                <button id="saveProjectButton" class="bg-white text-gray-700 px-6 py-3 rounded-full hover:bg-gray-50 shadow-lg transition-all flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                    </svg>
+                    <span>프로젝트 저장</span>
+                </button>
+                <button id="shareProjectButton" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-full shadow-lg transition-all flex items-center space-x-2">
+                    <span>프로젝트 공유</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </main>
+    
+    <!-- JavaScript: 프로젝트 저장, 공유 및 가격 필터 기능 구현 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const saveProjectButton = document.getElementById("saveProjectButton");
+            const shareProjectButton = document.getElementById("shareProjectButton");
+            const applyPriceFilterButton = document.getElementById("applyPriceFilter");
+            const viewerCanvas = document.getElementById("viewerCanvas");
+            const ctx = viewerCanvas.getContext('2d');
+            
+            // 로컬 스토리지에서 생성된 이미지 표시
+            const storedImage = localStorage.getItem("aiDesignImage");
+            
+            if (storedImage) {
+                // 이미지가 있으면 캔버스에 그리기
+                const img = new Image();
+                img.onload = function() {
+                    // 캔버스 크기를 이미지에 맞게 조정
+                    viewerCanvas.width = img.width;
+                    viewerCanvas.height = img.height;
+                    ctx.drawImage(img, 0, 0, viewerCanvas.width, viewerCanvas.height);
+                };
+                img.src = storedImage;
+            } else {
+                // 이미지가 없을 경우 안내 메시지 표시
+                viewerCanvas.width = 500;
+                viewerCanvas.height = 500;
+                ctx.fillStyle = "#f3f4f6";
+                ctx.fillRect(0, 0, viewerCanvas.width, viewerCanvas.height);
+                ctx.fillStyle = "#6366F1";
+                ctx.font = "20px Space Grotesk";
+                ctx.textAlign = "center";
+                ctx.fillText("이미지가 준비되지 않았습니다.", viewerCanvas.width/2, viewerCanvas.height/2);
+                ctx.fillText("먼저 AI 디자인 생성을 완료해주세요.", viewerCanvas.width/2, viewerCanvas.height/2 + 30);
+            }
+            
+            // 프로젝트 저장: 이미지를 PNG 파일로 다운로드
+            saveProjectButton.addEventListener("click", function () {
+                if (storedImage) {
+                    const link = document.createElement("a");
+                    link.href = storedImage;
+                    link.download = "dream_furniture.png";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert("저장할 이미지가 없습니다.");
+                }
+            });
+
+            // 나머지 코드는 그대로 유지...
+            shareProjectButton.addEventListener("click", async function () {
+                if (!storedImage) {
+                    alert("공유할 이미지가 없습니다.");
+                    return;
+                }
+                
+                try {
+                    // 이미지 URL에서 Blob 생성
+                    const response = await fetch(storedImage);
+                    const blob = await response.blob();
+                    const item = new ClipboardItem({ "image/png": blob });
+                    await navigator.clipboard.write([item]);
+                    alert("프로젝트 이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");
+                } catch (err) {
+                    console.error("이미지 복사 실패", err);
+                    alert("이미지 복사에 실패했습니다.");
+                }
+            });
+            
+            // 가격 필터 적용 버튼 이벤트 및 입력 검증
+            applyPriceFilterButton.addEventListener("click", function() {
+                const minPriceInput = document.getElementById("minPrice");
+                const maxPriceInput = document.getElementById("maxPrice");
+                const minPriceVal = Number(minPriceInput.value);
+                const maxPriceVal = Number(maxPriceInput.value);
+    
+                // 숫자가 0 미만이면 경고 후 0으로 보정
+                if (minPriceVal < 0) {
+                    alert("최소 가격은 0보다 작을 수 없습니다.");
+                    minPriceInput.value = 0;
+                    return;
+                }
+                if (maxPriceInput.value !== "" && maxPriceVal < 0) {
+                    alert("최대 가격은 0보다 작을 수 없습니다.");
+                    maxPriceInput.value = 0;
+                    return;
+                }
+    
+                // 최대 가격이 설정되어 있을 때 최소 가격이 최대 가격보다 높으면 경고
+                if (maxPriceInput.value !== "" && minPriceVal > maxPriceVal) {
+                    alert("최소 가격은 최대 가격보다 클 수 없습니다.");
+                    return;
+                }
+    
+                console.log("가격 필터 적용:", minPriceVal, maxPriceVal);
+                // 여기서 추가적인 가격 필터링 기능 구현 가능
+            });
+        });
+    </script>
+</body>
+</html>

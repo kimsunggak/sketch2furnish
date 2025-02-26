@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가꿈 - AI 가구 디자인</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-primary: linear-gradient(135deg, #6366F1, #A855F7);
+            --gradient-secondary: linear-gradient(135deg, #EEF2FF, #F5F3FF);
+        }
+
+        * {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .gradient-text {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-pattern {
+            background: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-pattern::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 1px 1px, #6366F1 1px, transparent 0),
+                radial-gradient(circle at 1px 1px, #A855F7 1px, transparent 0);
+            background-size: 30px 30px, 50px 50px;
+            background-position: 0 0, 15px 15px;
+            opacity: 0.1;
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(white, white) padding-box,
+                        var(--gradient-primary) border-box;
+            border: 2px solid transparent;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(40px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="fixed w-full z-50 glass-effect">
+        <div class="container mx-auto px-6">
+            <nav class="flex items-center justify-between h-20">
+                <a href="index.html" class="text-2xl font-bold gradient-text tracking-tight">가꿈</a>
+                <div class="hidden md:flex">
+                    <span class="text-gray-700 text-lg">Where Dreams Are Drawn ⁞ 앨리스 AI Spark Camp ⁞ 1조</span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-24 hero-pattern min-h-screen flex items-center">
+        <div class="container mx-auto px-6 relative">
+            <div class="blob bg-indigo-300 w-96 h-96 top-0 left-0"></div>
+            <div class="blob bg-purple-300 w-96 h-96 bottom-0 right-0"></div>
+            <div class="grid lg:grid-cols-2 gap-16 items-center relative">
+                <div class="space-y-8">
+                    <h1 class="text-7xl font-bold leading-tight tracking-tight">
+                        Design Your <span class="gradient-text">Dream</span>
+                        <span class="gradient-text">Furniture</span>
+                        with AI
+                    </h1>
+                    <p class="text-xl text-gray-600 leading-relaxed">
+                        AI의 혁신적인 기술로 당신만의 독특한 가구를 디자인하세요.<br>
+                        당신의 스케치가 가꿈과 함께 완성도 높은 가구로 탄생합니다.
+                    </p>
+                    <div class="flex flex-wrap gap-6">
+                        <button onclick="goToPage()" class="bg-indigo-600 text-white px-8 py-4 rounded-full hover:bg-indigo-700 transition-all transform hover:scale-105">
+                            시작하기
+                        </button>
+                        <script>
+                            function goToPage() {
+                                window.location.href = "1_sketch.html";
+                            }
+                        </script>
+                        <button onclick="openDemoModal()" class="gradient-border rounded-full px-8 py-4 text-indigo-600 hover:bg-gray-50 transition-all">
+                            데모 보기
+                        </button>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-3xl filter blur-3xl"></div>
+                    <img src="img/AI Furniture Design.png" alt="AI Furniture Design" class="relative rounded-3xl shadow-2xl floating">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-32 bg-white relative overflow-hidden">
+        <div class="container mx-auto px-6">
+            <div class="text-center max-w-3xl mx-auto mb-20">
+                <h2 class="text-5xl font-bold mb-6">How It Works</h2>
+                <p class="text-xl text-gray-600 leading-relaxed">
+                    AI와 함께하는 혁신적인 디자인 프로세스를 경험하세요.<br>
+                    당신의 아이디어가 실제 가구로 탄생하는 순간을 목격하세요.
+                </p>
+            </div>
+            <div class="feature-grid">
+                <div class="card-hover bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center text-2xl font-bold text-white mb-6">
+                        1
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Ideation</h3>
+                    <p class="text-gray-600">자유롭게 아이디어를 스케치하고 영감을 얻으세요. AI가 당신의 생각을 이해하고 발전시킵니다.</p>
+                </div>
+                <div class="card-hover bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center text-2xl font-bold text-white mb-6">
+                        2
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">AI Enhancement</h3>
+                    <p class="text-gray-600">AI가 당신의 스케치를 분석하여 전문적인 디자인으로 변환해드립니다. 실시간으로 수정이 가능합니다.</p>
+                </div>
+                <div class="card-hover bg-white rounded-3xl p-8 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center text-2xl font-bold text-white mb-6">
+                        3
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Recommendation</h3>
+                    <p class="text-gray-600">
+                        AI가 생성한 가구 이미지와 유사한 실제 제품을 분석하여 추천하고, 원하는 가격대로 필터링할 수 있습니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="py-32 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="space-y-8">
+                    <h2 class="text-5xl font-bold leading-tight">Create Without Limits</h2>
+                    <p class="text-xl text-gray-600">
+                        AI가 당신의 창의력을 증폭시킵니다. 전문적인 디자인 지식이 없어도
+                        누구나 아름다운 가구를 만들 수 있습니다.
+                    </p>
+                    <div class="grid grid-cols-1 gap-6">
+                        <div class="flex items-center">
+                            <div>
+                                <h3 class="text-xl font-bold">실시간 AI 지원</h3>
+                                <p class="text-gray-600">디자인 과정에서 즉각적인 피드백과 제안을 받아보세요.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div>
+                                <h3 class="text-xl font-bold">전문가의 손길</h3>
+                                <p class="text-gray-600">세심한 디테일과 완성도 높은 디자인 마감으로 당신의 가구를 더욱 돋보이게 만듭니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <img src="img/Furniture Sketch.png" alt="Furniture Sketch" class="rounded-3xl shadow-xl">
+                    <img src="img/Furniture Design.jpeg" alt="Furniture Design" class="rounded-3xl shadow-xl mt-16">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-32 bg-gradient-to-br from-indigo-600 to-purple-600 relative overflow-hidden">
+        <div class="container mx-auto px-6 relative">
+            <div class="max-w-3xl mx-auto text-center text-white">
+                <h2 class="text-5xl font-bold mb-8">오늘부터 꿈을 디자인해요!</h2>
+                <p class="text-xl mb-12 opacity-90">
+                    가꿈과 함께라면, 상상 속의 귀여운 가구들이 현실로 다가와요.<br>
+                    복잡한 절차 없이 누구나 쉽게 시작할 수 있습니다.
+                </p>
+                <button onclick="goToPage()" class="bg-white text-indigo-600 px-12 py-5 rounded-full text-xl font-bold hover:bg-gray-50 transition-all transform hover:scale-105">
+                    지금 시작하기
+                </button>
+                <script>
+                    function goToPage() {
+                        window.location.href = "1_sketch.html";
+                    }
+                </script>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-20">
+        <div class="container mx-auto px-6">
+            <!-- 2-Column Footer -->
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Left Column: 브랜드/간단 소개 (텍스트 왼쪽 정렬) -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold gradient-text">가꿈</h3>
+                    <p class="text-gray-400">
+                        가꿈은 AI의 마법으로 꿈꾸던 가구를 현실로 만듭니다.<br>
+                        따뜻한 감성과 혁신이 어우러진 새로운 디자인의 시대를 열어갑니다.
+                    </p>
+                    <div class="flex justify-start space-x-4 mt-6">
+                        <!-- GitHub 아이콘 링크 수정 -->
+                        <a href="https://github.com/kimsunggak/sketch2furnish" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302
+                                    3.438 9.8 8.207 11.387.599.111.793-.261.793
+                                    -.577v-2.234c-3.338.726-4.033-1.416-4.033
+                                    -1.416-.546-1.387-1.333-1.756-1.333
+                                    -1.756-1.089-.745.083-.729.083-.729
+                                    1.205.084 1.839 1.237 1.839 1.237
+                                    1.07 1.834 2.807 1.304 3.492.997
+                                    .107-.775.418-1.305.762-1.604
+                                    -2.665-.305-5.467-1.334-5.467
+                                    -5.931 0-1.311.469-2.381 1.236
+                                    -3.221-.124-.303-.535-1.524.117
+                                    -3.176 0 0 1.008-.322 3.301
+                                    1.23.957-.266 1.983-.399
+                                    3.003-.404 1.02.005 2.047
+                                    .138 3.006.404 2.291-1.552
+                                    3.297-1.23 3.297-1.23.653
+                                    1.653.242 2.874.118 3.176
+                                    .77.84 1.235 1.911 1.235
+                                    3.221 0 4.609-2.807 5.624
+                                    -5.479 5.921.43.372.823
+                                    1.102.823 2.222v3.293c0
+                                    .319.192.694.801.576
+                                    4.765-1.589 8.199-6.086
+                                    8.199-11.386 0-6.627-5.373
+                                    -12-12-12z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Column: 앨리스 AI Spark Camp 정보 (텍스트 왼쪽 정렬) -->
+                <div>
+                    <h4 class="text-lg font-bold mb-6">앨리스 AI Spark Camp</h4>
+                    <ul class="space-y-4 text-gray-400">
+                        <li>엘리스 클라우드 제공</li>
+                        <li>엘리스 ML API 제공</li>
+                        <li>기간: 2025년 02월 09일 - 2025년 03월 01일</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">&copy; 2025 가꿈. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="https://github.com/skskskskdus" class="text-gray-400 hover:text-white text-sm">skskskskdus</a>
+                    <a href="https://github.com/kimsunggak" class="text-gray-400 hover:text-white text-sm">kimsunggak</a>
+                    <a href="https://github.com/chaaaaae" class="text-gray-400 hover:text-white text-sm">chaaaaae</a>
+                    <a href="https://github.com/sth0824" class="text-gray-400 hover:text-white text-sm">sth0824</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Demo Modal -->
+    <div id="demoModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+        <div class="bg-white p-6 rounded-lg relative max-w-3xl mx-4">
+            <button onclick="closeDemoModal()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
+            <img id="demoGif" src="img/Demo.gif" alt="Demo" class="rounded-lg max-w-full max-h-screen">
+        </div>
+    </div>
+
+    <!-- Modal Scripts -->
+    <script>
+        function openDemoModal() {
+            var gif = document.getElementById("demoGif");
+            // 새로운 쿼리 스트링을 추가하여 이미지를 새로 고침
+            gif.src = "img/Demo.gif?" + new Date().getTime();
+            document.getElementById("demoModal").classList.remove("hidden");
+        }
+        function closeDemoModal() {
+            document.getElementById("demoModal").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
