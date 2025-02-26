@@ -1,0 +1,132 @@
+# -----------------------------
+# OS & 편집기 관련
+# -----------------------------
+.DS_Store
+*~
+.idea/
+
+# -----------------------------
+# 일반 빌드 산출물 / 임시파일
+# -----------------------------
+debug*
+build/
+dist/
+checkpoints/
+results/
+
+wandb/
+
+*.png
+
+# -----------------------------
+# Torch 관련
+# -----------------------------
+torch.egg-info/
+torch/version.py
+torch/csrc/generic/TensorMethods.cpp
+torch/lib/*.so*
+torch/lib/*.dylib*
+torch/lib/*.h
+torch/lib/build
+torch/lib/tmp_install
+torch/lib/include
+torch/lib/torch_shm_manager
+torch/csrc/cudnn/cuDNN.cpp
+torch/csrc/nn/THNN.cwrap
+torch/csrc/nn/THNN.cpp
+torch/csrc/nn/THCUNN.cwrap
+torch/csrc/nn/THCUNN.cpp
+torch/csrc/nn/THNN_generic.cwrap
+torch/csrc/nn/THNN_generic.cpp
+torch/csrc/nn/THNN_generic.h
+
+# -----------------------------
+# 문서 & 테스트 산출물
+# -----------------------------
+docs/src/**/*
+test/data/legacy_modules.t7
+test/data/gpu_tensors.pt
+test/data/legacy_serialized.pt
+test/htmlcov
+test/.coverage
+docs/
+# -----------------------------
+# Python 관련 (캐시, 빌드, 가상환경 등)
+# -----------------------------
+
+# Byte-compiled / optimized
+__pycache__/
+**/__pycache__/
+*.py[cod]
+**/*.pyc
+**/**/*.pyc
+**/**/**/*.pyc
+
+# C extensions
+*.so
+*.so.*
+*.dylib*
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+.installed.cfg
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+htmlcov/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+myenv/
+# PyInstaller
+# (If used)
+# *.spec
+
+# Jupyter
+.ipynb_checkpoints
+
+# Django / Flask 등
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+instance/
+.webassets-cache
+*.log
+
+# -----------------------------
+# 파이썬 의존성/관리 툴
+# -----------------------------
+.pdm.toml
+.pdm-python
+.pdm-build/
+pdm.lock
+
+# Pipenv
+# Pipfile.lock
+
+# Poetry
+# poetry.lock
+
+# UV
+# uv.lock
