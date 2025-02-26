@@ -4,7 +4,7 @@
 > **Pix2Pix 모델을 기존 `edges2handbags`에서 `가구 도메인`으로 파인튜닝**
 
 <p align="center">
-  <img src=r"C:\Users\sunggak\Desktop\sketch2furnish\img\Demo.gif"
+  <img src="img/Demo.gif">
 </p>
 
 ---
