@@ -167,35 +167,42 @@
                 <!-- Preview Area -->
                 <div class="lg:col-span-6">
                     <div class="canvas-bg rounded-3xl p-8 shadow-lg">
-                        <div class="gradient-border rounded-2xl bg-white p-4">
-                            <br>
-                            <!-- 미리보기 이미지 (id="designPreview") -->
-                            <img id="designPreview" src="img/Design Preview.jpeg" alt="Design Preview" class="rounded-xl w-full">
-                            <div class="flex justify-between items-center mt-4">
-                                <div>
-                                    <!-- 버전 / 수정일 표시 (id 추가) -->
-                                    <h3 id="previewVersion" class="font-semibold text-lg">현재 버전: v1.2</h3>
-                                    <p id="previewDate" class="text-gray-500 text-sm">최종 수정: 2024.01.05</p>
-                                </div>
-                                <!-- 저장하기 & 공유하기 버튼 (현재버전 옆) -->
-                                <div class="flex space-x-3">
-                                    <button id="savePreviewButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1">
-                                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                                        </svg>
-                                        <span class="text-sm">저장하기</span>
-                                    </button>
-                                    <button id="sharePreviewButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1">
-                                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                                        </svg>
-                                        <span class="text-sm">공유하기</span>
-                                    </button>
-                                </div>
-                            </div>
+                    <div class="gradient-border rounded-2xl bg-white p-4">
+                        <!-- 이미지 중앙 정렬을 위한 래퍼 -->
+                        <div class="flex justify-center items-center">
+                        <!-- 기본 src를 빈 문자열로 변경 -->
+                        <img id="designPreview" src="" alt="Design Preview" class="rounded-xl w-full max-w-[710px] mx-auto">
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                        <div>
+                            <!-- 버전 / 수정일 표시 -->
+                            <h3 id="previewVersion" class="font-semibold text-lg">현재 버전: v1.2</h3>
+                            <p id="previewDate" class="text-gray-500 text-sm">최종 수정: 2024.01.05</p>
+                        </div>
+                        <!-- 저장하기 & 공유하기 버튼 -->
+                        <div class="flex space-x-3">
+                            <button id="savePreviewButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                                </path>
+                            </svg>
+                            <span class="text-sm">저장하기</span>
+                            </button>
+                            <button id="sharePreviewButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
+                                </path>
+                            </svg>
+                            <span class="text-sm">공유하기</span>
+                            </button>
+                        </div>
                         </div>
                     </div>
+                    </div>
                 </div>
+  
 
                 <!-- Controls Panel -->
                 <div class="lg:col-span-3 space-y-6">
@@ -330,6 +337,43 @@
                     }
                 }, "image/png");
             });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          // 예시: 스케치 파일이 준비된 FormData 객체 (여기서는 'formData'가 이미 준비되었다고 가정)
+          fetch("https://dzbqrrjyhewyahrb.tunnel-pt.elice.io/proxy/8000/inference", {
+            method: "POST",
+            body: formData
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("서버 응답 오류: " + response.statusText);
+            }
+            return response.blob();
+          })
+          .then(blob => {
+            const reader = new FileReader();
+            reader.onloadend = function() {
+              document.getElementById("designPreview").src = reader.result;
+            };
+            reader.readAsDataURL(blob);
+          })
+          .catch(error => {
+            console.error("이미지 전송 실패:", error);
+            alert("이미지 전송에 실패했습니다. 콘솔을 확인하세요.");
+          });
+        });
+      </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const previewImage = document.getElementById("designPreview");
+            const storedImage = localStorage.getItem("aiDesignImage");
+            if (storedImage) {
+                previewImage.src = storedImage;
+                // 필요시 로컬 스토리지에서 제거합니다.
+                localStorage.removeItem("aiDesignImage");
+            }
         });
     </script>
 </body>
