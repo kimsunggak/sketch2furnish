@@ -303,24 +303,29 @@
                         </div>
                     </div>
                     
-                    <!-- 레퍼런스 갤러리 추가 (캔버스 아래에 배치) -->
+                    <!-- 레퍼런스 갤러리 코드 수정 -->
                     <div class="bg-white rounded-3xl p-6 shadow-lg card-hover mt-6">
                         <h3 class="text-lg font-bold mb-6 gradient-text">References</h3>
                         <div class="grid grid-cols-5 gap-4">
-                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
-                                <img src="img\reference1.png" alt="Reference 1" class="w-full h-32 object-cover" data-ref="img/Reference.jpg">
+                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden hover:shadow-lg transition-all">
+                                <img src="img/reference1.png" alt="소파" class="w-full h-32 object-cover shadow-md" data-ref="img/reference1.png">
+                                <p class="text-center mt-2 text-sm font-medium text-gray-700">소파</p>
                             </div>
-                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
-                                <img src="img\reference2.png" alt="Reference 2" class="w-full h-32 object-cover" data-ref="img/Reference2.jpg">
+                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden hover:shadow-lg transition-all">
+                                <img src="img/reference2.png" alt="옷장" class="w-full h-32 object-cover shadow-md" data-ref="img/reference2.png">
+                                <p class="text-center mt-2 text-sm font-medium text-gray-700">장롱</p>
                             </div>
-                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
-                                <img src="img\reference3.png" alt="Reference 3" class="w-full h-32 object-cover" data-ref="img/Reference3.jpg">
+                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden hover:shadow-lg transition-all">
+                                <img src="img/reference3.png" alt="의자" class="w-full h-32 object-cover shadow-md" data-ref="img/reference3.png">
+                                <p class="text-center mt-2 text-sm font-medium text-gray-700">의자</p>
                             </div>
-                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
-                                <img src="img\reference4.png" alt="Reference 4" class="w-full h-32 object-cover" data-ref="img/Reference4.jpg">
+                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden hover:shadow-lg transition-all">
+                                <img src="img/reference4.png" alt="테이블" class="w-full h-32 object-cover shadow-md" data-ref="img/reference4.png">
+                                <p class="text-center mt-2 text-sm font-medium text-gray-700">테이블</p>
                             </div>
-                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all">
-                                <img src="img\reference5.png" alt="Reference 5" class="w-full h-32 object-cover" data-ref="img/Reference5.jpg">
+                            <div class="reference-item cursor-pointer rounded-xl overflow-hidden hover:shadow-lg transition-all">
+                                <img src="img/reference5.png" alt="모니터" class="w-full h-32 object-cover shadow-md" data-ref="img/reference5.png">
+                                <p class="text-center mt-2 text-sm font-medium text-gray-700">모니터</p>
                             </div>
                         </div>
                     </div>
@@ -539,6 +544,7 @@
             referenceItems.forEach(item => {
                 item.addEventListener('click', function() {
                     const imgSrc = this.getAttribute('data-ref');
+                    console.log('이미지 클릭됨:', imgSrc); // 디버깅용
                     
                     // 이미지 로드 및 캔버스에 그리기
                     const img = new Image();
@@ -552,12 +558,19 @@
                         const x = (canvas.width - img.width * scale) / 2;
                         const y = (canvas.height - img.height * scale) / 2;
                         
-                        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                        ctx.drawImage(img, 0, 0, img.width, img.height, x, y, img.width * scale, img.height * scale);
                         
                         // 로컬 스토리지에 캔버스 데이터 저장
                         const dataUrl = canvas.toDataURL("image/png");
                         localStorage.setItem("savedCanvas", dataUrl);
+                        console.log('이미지가 캔버스에 그려짐');
                     };
+                    
+                    img.onerror = function() {
+                        console.error('이미지 로드 실패:', imgSrc);
+                        alert('레퍼런스 이미지를 불러올 수 없습니다.');
+                    };
+                    
                     img.src = imgSrc;
                 });
             });
