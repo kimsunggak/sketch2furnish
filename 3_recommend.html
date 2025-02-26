@@ -147,24 +147,61 @@
         document.addEventListener('DOMContentLoaded', function () {
             const saveProjectButton = document.getElementById("saveProjectButton");
             const shareProjectButton = document.getElementById("shareProjectButton");
-            const viewerCanvas = document.getElementById("viewerCanvas");
             const applyPriceFilterButton = document.getElementById("applyPriceFilter");
+            const viewerCanvas = document.getElementById("viewerCanvas");
+            const ctx = viewerCanvas.getContext('2d');
             
-            // 프로젝트 저장: viewerCanvas를 PNG 파일로 다운로드
+            // 로컬 스토리지에서 생성된 이미지 표시
+            const storedImage = localStorage.getItem("aiDesignImage");
+            
+            if (storedImage) {
+                // 이미지가 있으면 캔버스에 그리기
+                const img = new Image();
+                img.onload = function() {
+                    // 캔버스 크기를 이미지에 맞게 조정
+                    viewerCanvas.width = img.width;
+                    viewerCanvas.height = img.height;
+                    ctx.drawImage(img, 0, 0, viewerCanvas.width, viewerCanvas.height);
+                };
+                img.src = storedImage;
+            } else {
+                // 이미지가 없을 경우 안내 메시지 표시
+                viewerCanvas.width = 500;
+                viewerCanvas.height = 500;
+                ctx.fillStyle = "#f3f4f6";
+                ctx.fillRect(0, 0, viewerCanvas.width, viewerCanvas.height);
+                ctx.fillStyle = "#6366F1";
+                ctx.font = "20px Space Grotesk";
+                ctx.textAlign = "center";
+                ctx.fillText("이미지가 준비되지 않았습니다.", viewerCanvas.width/2, viewerCanvas.height/2);
+                ctx.fillText("먼저 AI 디자인 생성을 완료해주세요.", viewerCanvas.width/2, viewerCanvas.height/2 + 30);
+            }
+            
+            // 프로젝트 저장: 이미지를 PNG 파일로 다운로드
             saveProjectButton.addEventListener("click", function () {
-                const imageData = viewerCanvas.toDataURL("image/png");
-                const link = document.createElement("a");
-                link.href = imageData;
-                link.download = "project.png";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                if (storedImage) {
+                    const link = document.createElement("a");
+                    link.href = storedImage;
+                    link.download = "dream_furniture.png";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert("저장할 이미지가 없습니다.");
+                }
             });
-    
-            // 프로젝트 공유: viewerCanvas의 이미지를 클립보드에 복사
+
+            // 나머지 코드는 그대로 유지...
             shareProjectButton.addEventListener("click", async function () {
+                if (!storedImage) {
+                    alert("공유할 이미지가 없습니다.");
+                    return;
+                }
+                
                 try {
-                    const blob = await new Promise(resolve => viewerCanvas.toBlob(resolve, "image/png"));
+                    // 이미지 URL에서 Blob 생성
+                    const response = await fetch(storedImage);
+                    const blob = await response.blob();
                     const item = new ClipboardItem({ "image/png": blob });
                     await navigator.clipboard.write([item]);
                     alert("프로젝트 이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");

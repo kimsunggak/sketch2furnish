@@ -256,6 +256,11 @@
                         <button onclick="goToPage()"  class="tool-button w-full gradient-border rounded-xl p-4 text-left hover:bg-gray-50 transition-all group">
                             <script>
                                 function goToPage() {
+                                    // 현재 이미지를 localStorage에 저장
+                                    const previewImage = document.getElementById("designPreview");
+                                    if (previewImage.src) {
+                                        localStorage.setItem("aiDesignImage", previewImage.src);
+                                    }
                                     window.location.href = "3_recommend.html";
                                 }
                             </script>
@@ -371,10 +376,19 @@
             const storedImage = localStorage.getItem("aiDesignImage");
             if (storedImage) {
                 previewImage.src = storedImage;
-                // 필요시 로컬 스토리지에서 제거합니다.
-                localStorage.removeItem("aiDesignImage");
+                // 이미지를 삭제하지 않고 유지
+                // localStorage.removeItem("aiDesignImage"); <- 이 줄을 제거 또는 주석 처리
             }
         });
+
+        function goToPage() {
+            // 현재 이미지를 localStorage에 저장
+            const previewImage = document.getElementById("designPreview");
+            if (previewImage.src) {
+                localStorage.setItem("aiDesignImage", previewImage.src);
+            }
+            window.location.href = "3_recommend.html";
+        }
     </script>
 </body>
 </html>
