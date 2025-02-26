@@ -113,8 +113,8 @@
                         <div class="mt-6">
                             <h4 class="text-lg font-bold text-gray-700 mb-2">가격 범위 설정</h4>
                             <div class="flex items-center space-x-4">
-                                <input type="number" id="minPrice" placeholder="최소 가격" class="w-1/2 px-3 py-2 border rounded-lg focus:outline-none">
-                                <input type="number" id="maxPrice" placeholder="최대 가격" class="w-1/2 px-3 py-2 border rounded-lg focus:outline-none">
+                                <input type="number" id="minPrice" placeholder="최소 가격" step="10000" min="0" class="w-1/2 px-3 py-2 border rounded-lg focus:outline-none">
+                                <input type="number" id="maxPrice" placeholder="최대 가격" step="10000" min="0" class="w-1/2 px-3 py-2 border rounded-lg focus:outline-none">
                             </div>
                             <button id="applyPriceFilter" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg shadow hover:bg-indigo-700 transition-all">
                                 가격 필터 적용
@@ -167,19 +167,40 @@
                     const blob = await new Promise(resolve => viewerCanvas.toBlob(resolve, "image/png"));
                     const item = new ClipboardItem({ "image/png": blob });
                     await navigator.clipboard.write([item]);
-                    alert("프로젝트 이미지가 클립보드에 복사되었습니다!");
+                    alert("프로젝트 이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");
                 } catch (err) {
                     console.error("이미지 복사 실패", err);
                     alert("이미지 복사에 실패했습니다.");
                 }
             });
             
-            // 가격 필터 적용 버튼 이벤트
+            // 가격 필터 적용 버튼 이벤트 및 입력 검증
             applyPriceFilterButton.addEventListener("click", function() {
-                const minPrice = document.getElementById("minPrice").value;
-                const maxPrice = document.getElementById("maxPrice").value;
-                console.log("가격 필터 적용:", minPrice, maxPrice);
-                // 여기에 가격 필터링 기능 구현 코드를 추가할 수 있습니다.
+                const minPriceInput = document.getElementById("minPrice");
+                const maxPriceInput = document.getElementById("maxPrice");
+                const minPriceVal = Number(minPriceInput.value);
+                const maxPriceVal = Number(maxPriceInput.value);
+    
+                // 숫자가 0 미만이면 경고 후 0으로 보정
+                if (minPriceVal < 0) {
+                    alert("최소 가격은 0보다 작을 수 없습니다.");
+                    minPriceInput.value = 0;
+                    return;
+                }
+                if (maxPriceInput.value !== "" && maxPriceVal < 0) {
+                    alert("최대 가격은 0보다 작을 수 없습니다.");
+                    maxPriceInput.value = 0;
+                    return;
+                }
+    
+                // 최대 가격이 설정되어 있을 때 최소 가격이 최대 가격보다 높으면 경고
+                if (maxPriceInput.value !== "" && minPriceVal > maxPriceVal) {
+                    alert("최소 가격은 최대 가격보다 클 수 없습니다.");
+                    return;
+                }
+    
+                console.log("가격 필터 적용:", minPriceVal, maxPriceVal);
+                // 여기서 추가적인 가격 필터링 기능 구현 가능
             });
         });
     </script>

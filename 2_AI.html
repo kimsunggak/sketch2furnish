@@ -323,7 +323,7 @@
                     try {
                         const item = new ClipboardItem({ "image/png": blob });
                         await navigator.clipboard.write([item]);
-                        alert("이미지가 클립보드에 복사되었습니다!");
+                        alert("이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");
                     } catch (err) {
                         console.error("이미지 복사 실패", err);
                         alert("이미지 복사에 실패했습니다.");
