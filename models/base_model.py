@@ -85,7 +85,7 @@ class BaseModel(ABC):
         #학습 중 학습률을 동적으로 조정하기 위함
         if self.isTrain:
             self.schedulers = [networks.get_scheduler(optimizer, opt) for optimizer in self.optimizers]
-        if not self.isTrain or opt.continue_train:
+        if not self.isTrain or opt.continue_train: # 학습 모드가 아닐때 지정한 에폭의 체크포인트 파일을 불러옴
             load_suffix = 'iter_%d' % opt.load_iter if opt.load_iter > 0 else opt.epoch
             self.load_networks(load_suffix)
         self.print_networks(opt.verbose)

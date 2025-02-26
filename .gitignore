@@ -98,7 +98,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+myenv/
 # PyInstaller
 # (If used)
 # *.spec
