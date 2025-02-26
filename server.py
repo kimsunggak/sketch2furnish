@@ -33,9 +33,8 @@ model = networks.define_G(
 model.to(device)
 
 # 모델 가중치 로드 (모델 파일 경로를 환경에 맞게 수정하세요)
-model_path = r"C:\Users\sunggak\Desktop\sketch2furnish\checkpoints\furniture_pix2pix\latest_net_G.pth"
+model_path = r"C:\Users\sunggak\Desktop\sketch2furnish\checkpoints\last_try\latest_net_G.pth"
 model.load_state_dict(torch.load(model_path, map_location=device))
-model.eval()
 
 # ---------------------------
 # FastAPI 앱 및 CORS 설정
