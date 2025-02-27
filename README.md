@@ -13,3 +13,4 @@ mongodump --db furniture_db --out backup/ : 백업 폴더로 db 옮김
 mongorestore --uri "mongodb+srv://username:password@sthcluster.sisvx.mongodb.net/furniture_db" --drop backup/furniture_db
 :백업 폴더에서 클러스터로 푸쉬하는 명령어
 
+!!프론트엔드 코드에서는 
