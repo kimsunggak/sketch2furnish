@@ -50,6 +50,11 @@
                 color: white;
                 transform: translateY(-2px);
             }
+            /* 활성화된 도구 버튼 스타일 */
+            .active-tool {
+                background: var(--gradient-primary) !important;
+                color: white !important;
+            }
             .upload-area {
                 border: 2px dashed #6366F1;
                 transition: all 0.3s ease;
@@ -91,9 +96,6 @@
                 const canvas = document.getElementById("sketchCanvas");
                 const ctx = canvas.getContext("2d");
         
-                let drawing = false;
-                let erasing = false;
-        
                 // 실제 픽셀 해상도를 256x256으로 고정
                 canvas.width = 256;
                 canvas.height = 256;
@@ -107,17 +109,73 @@
                 // 초기 캔버스 설정
                 clearCanvas();
                 ctx.lineCap = "round";
-                ctx.strokeStyle = "#FFFFFF";  // 흰색 펜 설정
                 ctx.lineWidth = 2;
         
-                // 도구 버튼
-                const pencilBtn = document.querySelector(".tool-button:nth-child(1)");
-                const eraserBtn = document.querySelector(".tool-button:nth-child(2)");
-                const clearBtn = document.querySelector(".tool-button:nth-child(3)");
+                // 도구 버튼 (ID를 부여하여 기존 기능은 그대로 유지)
+                const pencilBtn = document.getElementById("pencilBtn");
+                const lineBtn = document.getElementById("lineBtn");
+                const circleBtn = document.getElementById("circleBtn");
+                const squareBtn = document.getElementById("squareBtn");
+                const eraserBtn = document.getElementById("eraserBtn");
+                const clearBtn = document.getElementById("clearBtn");
         
                 // 크기 조절 슬라이더
                 const sizeSlider = document.querySelector("input[type='range']");
                 
+                // 현재 도구 (기능은 그대로 유지, 기본은 pencil)
+                let currentTool = "pencil";
+                let drawing = false;
+                let startX = 0, startY = 0;
+                let savedImageData = null;
+                
+                // 도구 활성화 상태 업데이트 함수 (초기 로드시엔 호출되지 않음)
+                function updateActiveTool(activeButton) {
+                    // 초기화 버튼 제외한 모든 도구 버튼에서 active-tool 클래스 제거
+                    document.querySelectorAll('.tool-button').forEach(btn => {
+                        if (btn.id !== "clearBtn") {
+                            btn.classList.remove("active-tool");
+                        }
+                    });
+                    activeButton.classList.add("active-tool");
+                }
+                
+                // 도구 선택 이벤트 리스너 (클릭 시 활성화 스타일 적용)
+                pencilBtn.addEventListener("click", function() {
+                    currentTool = "pencil";
+                    ctx.strokeStyle = "#FFFFFF"; // 흰색 선
+                    ctx.lineWidth = parseInt(sizeSlider.value);
+                    updateActiveTool(pencilBtn);
+                });
+                lineBtn.addEventListener("click", function() {
+                    currentTool = "line";
+                    ctx.strokeStyle = "#FFFFFF";
+                    ctx.lineWidth = parseInt(sizeSlider.value);
+                    updateActiveTool(lineBtn);
+                });
+                circleBtn.addEventListener("click", function() {
+                    currentTool = "circle";
+                    ctx.strokeStyle = "#FFFFFF";
+                    ctx.lineWidth = parseInt(sizeSlider.value);
+                    updateActiveTool(circleBtn);
+                });
+                squareBtn.addEventListener("click", function() {
+                    currentTool = "square";
+                    ctx.strokeStyle = "#FFFFFF";
+                    ctx.lineWidth = parseInt(sizeSlider.value);
+                    updateActiveTool(squareBtn);
+                });
+                eraserBtn.addEventListener("click", function() {
+                    currentTool = "eraser";
+                    ctx.strokeStyle = "#000000"; // 배경색과 동일하게 지우기
+                    ctx.lineWidth = parseInt(sizeSlider.value) + 5;
+                    updateActiveTool(eraserBtn);
+                });
+                clearBtn.addEventListener("click", function() {
+                    clearCanvas();
+                    localStorage.removeItem("savedCanvas");
+                    // 초기화 버튼 클릭 시 활성 도구 상태는 변경하지 않음
+                });
+        
                 // 마우스 위치 보정 함수
                 function getMousePos(event) {
                     const rect = canvas.getBoundingClientRect();
@@ -127,56 +185,55 @@
                     };
                 }
         
-                // 연필 선택 - 흰색 펜
-                pencilBtn.addEventListener("click", function() {
-                    erasing = false;
-                    ctx.strokeStyle = "#FFFFFF"; // 흰색 선
-                });
-        
-                // 지우개 선택 - 검은색으로 지우기
-                eraserBtn.addEventListener("click", function() {
-                    erasing = true;
-                    ctx.strokeStyle = "#000000"; // 검은색으로 지우기 (배경색과 동일)
-                    // 지우개 사용 시 선 두께를 약간 더 크게 설정
-                    ctx.lineWidth = parseInt(sizeSlider.value) + 5;
-                });
-        
-                // 초기화 버튼
-                clearBtn.addEventListener("click", function() {
-                    clearCanvas();
-                    // 로컬 스토리지 데이터도 삭제
-                    localStorage.removeItem("savedCanvas");
-                });
-        
-                // 크기 조절
-                sizeSlider.addEventListener("input", function(event) {
-                    const size = parseInt(event.target.value);
-                    if (!erasing) {
-                        ctx.lineWidth = size;
-                    } else {
-                        // 지우개 모드일 경우 약간만 굵게
-                        ctx.lineWidth = size + 3;
-                    }
-                });
-        
                 // 캔버스 이벤트
                 canvas.addEventListener("mousedown", (event) => {
                     drawing = true;
                     const { x, y } = getMousePos(event);
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
+                    if (currentTool === "pencil" || currentTool === "eraser") {
+                        ctx.beginPath();
+                        ctx.moveTo(x, y);
+                    } else if (currentTool === "line" || currentTool === "circle" || currentTool === "square") {
+                        startX = x;
+                        startY = y;
+                        savedImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    }
                 });
         
                 canvas.addEventListener("mousemove", (event) => {
                     if (!drawing) return;
                     const { x, y } = getMousePos(event);
-                    ctx.lineTo(x, y);
-                    ctx.stroke();
+                    if (currentTool === "pencil" || currentTool === "eraser") {
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                    } else if (currentTool === "line") {
+                        ctx.putImageData(savedImageData, 0, 0);
+                        ctx.beginPath();
+                        ctx.moveTo(startX, startY);
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                    } else if (currentTool === "circle") {
+                        ctx.putImageData(savedImageData, 0, 0);
+                        let radius = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
+                        ctx.beginPath();
+                        ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+                        ctx.stroke();
+                    } else if (currentTool === "square") {
+                        ctx.putImageData(savedImageData, 0, 0);
+                        let width = x - startX;
+                        let height = y - startY;
+                        ctx.beginPath();
+                        ctx.rect(startX, startY, width, height);
+                        ctx.stroke();
+                    }
                 });
         
                 canvas.addEventListener("mouseup", () => {
                     drawing = false;
-                    ctx.closePath();
+                    if (currentTool === "pencil" || currentTool === "eraser") {
+                        ctx.closePath();
+                    } else if (currentTool === "line" || currentTool === "circle" || currentTool === "square") {
+                        ctx.closePath();
+                    }
                     // 캔버스 상태를 로컬 스토리지에 저장
                     const dataUrl = canvas.toDataURL("image/png");
                     localStorage.setItem("savedCanvas", dataUrl);
@@ -191,14 +248,15 @@
                 if (savedDataUrl) {
                     const img = new Image();
                     img.onload = function () {
-                        clearCanvas(); // 먼저 검은색으로 초기화
+                        clearCanvas();
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     };
                     img.src = savedDataUrl;
                 } else {
-                    // 저장된 데이터가 없으면 빈 검은색 캔버스로 초기화
                     clearCanvas();
                 }
+                
+                // [변경 전] 기본 활성 도구 설정 코드는 제거되어, 로드시에는 어떤 도구도 하이라이트되지 않음.
             });
         </script>
         
@@ -208,7 +266,6 @@
         <header class="fixed w-full z-50 glass-effect">
             <div class="container mx-auto px-6">
                 <nav class="flex items-center justify-between h-20">
-                    <!-- 수정: href="#"를 href="index.html"로 변경하여 index 페이지로 이동 -->
                     <a href="index.html" class="text-2xl font-bold gradient-text tracking-tight">가꿈</a>
                     <div class="hidden md:flex">
                         <span class="text-gray-700 text-lg">Where Dreams Are Drawn ⁞ 앨리스 AI Spark Camp ⁞ 1조</span>
@@ -238,19 +295,43 @@
                         <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                             <h3 class="text-lg font-bold mb-6 gradient-text">Drawing Tools</h3>
                             <div class="space-y-4">
-                                <button class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
+                                <!-- 연필 -->
+                                <button id="pencilBtn" class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                     </svg>
                                     <span>연필</span>
                                 </button>
-                                <button class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
+                                <!-- 직선 -->
+                                <button id="lineBtn" class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <line x1="4" y1="20" x2="20" y2="4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></line>
+                                    </svg>
+                                    <span>직선</span>
+                                </button>
+                                <!-- 원형 -->
+                                <button id="circleBtn" class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle>
+                                    </svg>
+                                    <span>원형</span>
+                                </button>
+                                <!-- 사각형 -->
+                                <button id="squareBtn" class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <rect x="6" y="6" width="12" height="12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></rect>
+                                    </svg>
+                                    <span>사각형</span>
+                                </button>
+                                <!-- 지우개 -->
+                                <button id="eraserBtn" class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                     </svg>
                                     <span>지우개</span>
                                 </button>
-                                <button class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
+                                <!-- 초기화 -->
+                                <button id="clearBtn" class="tool-button w-full p-4 rounded-2xl flex items-center justify-center space-x-3 bg-gray-50">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                     </svg>
@@ -262,35 +343,23 @@
                         <!-- Properties 박스 -->
                         <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                             <h3 class="text-lg font-bold mb-6 gradient-text">Properties</h3>
-                            <br>
-                            <div class="space-y-6">
+                            <div class="space-y-4">
                                 <!-- 크기 -->
                                 <div>
                                     <label class="block text-sm text-gray-600 mb-2">크기</label>
                                     <input id="sizeSlider" type="range" class="w-full accent-indigo-600" min="0.5" max="30" value="2">
                                 </div>
-                                <!-- 크기 미리보기 박스 (Reference 박스와 동일한 크기) -->
-                                <div class="bg-gray-100 p-6 rounded-2xl flex justify-center items-center h-[200px] w-full">
+                                <!-- 크기 미리보기 박스 -->
+                                <div class="bg-gray-100 p-4 rounded-2xl flex justify-center items-center h-[100px] w-full">
                                     <div id="sizePreview" class="rounded-full bg-indigo-600 transition-all"></div>
                                 </div>
-                                <br>
                             </div>
                         </div>
-        
-                        <!-- 홈페이지 가기 버튼 (Properties 아래) -->
-                        <button onclick="goToHomePage()" 
-                            class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-full px-8 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center justify-center space-x-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                            </svg>
-                            <span>홈페이지 가기</span>
-                        </button>
                     </div>
         
                     <!-- Canvas Area -->
                     <div class="lg:col-span-8">
                         <div class="canvas-bg rounded-3xl p-8 shadow-lg">
-                            <!-- gradient-border 래퍼로 캔버스를 감싸고 중앙 정렬 -->
                             <div class="gradient-border rounded-2xl bg-white p-4 flex justify-center items-center">
                                 <canvas id="sketchCanvas" width="256" height="256" class="w-full h-auto rounded-xl" style="max-width: 710px; aspect-ratio: 1 / 1;"></canvas>
                             </div>
@@ -302,7 +371,6 @@
                         <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                             <h3 class="text-lg font-bold mb-6 gradient-text">Upload</h3>
                             <div class="upload-area rounded-2xl p-6 text-center">
-                                <!-- Drag & Drop 아이콘: 원래 아이콘 코드로 복원 -->
                                 <svg class="w-12 h-12 mx-auto mb-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
@@ -329,7 +397,7 @@
                             </button>
                         </div>
         
-                        <!-- References Carousel (공유하기 아래) -->
+                        <!-- References Carousel -->
                         <div id="referencesCarousel" class="relative bg-white rounded-3xl p-6 shadow-lg card-hover">
                             <h3 class="text-lg font-bold mb-6 gradient-text">References</h3>
                             <div class="overflow-hidden">
@@ -356,7 +424,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- 좌우 네비게이션 버튼 (화살표만 표시) -->
                             <button id="prevButton" class="absolute left-2 top-1/2 transform -translate-y-1/2 focus:outline-none text-3xl text-gray-300 hover:text-purple-400">
                                 ⟨
                             </button>
@@ -364,26 +431,35 @@
                                 ⟩
                             </button>
                         </div>
-        
-                        <!-- AI 디자인 생성 버튼 -->
-                        <button onclick="goToAIDesign()" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-full px-8 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center justify-center space-x-2">
-                            <span>AI 디자인 생성</span>
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                            </svg>
-                        </button>
                     </div>
+                </div>
+                
+                <!-- 버튼스테이션: 양끝정렬, 버튼 가로 여백 증가 -->
+                <div class="flex justify-between mt-8">
+                    <button onclick="goToHomePage()" 
+                        class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-12 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        <span>홈페이지 가기</span>
+                    </button>
+                    <button onclick="goToAIDesign()" 
+                        class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-12 py-3 rounded-full hover:opacity-90 shadow-lg transition-all flex items-center space-x-2">
+                        <span>AI 디자인 생성</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </main>
         
         <script>
             function goToHomePage() {
-                window.location.href = "index.html"; // 홈페이지 이동
+                window.location.href = "index.html";
             }
             async function goToAIDesign() {
                 const canvas = document.getElementById("sketchCanvas");
-                // 캔버스 blob 생성 (PNG)
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
                 const formData = new FormData();
                 formData.append("file", blob, "sketch.png");
@@ -397,15 +473,12 @@
                         throw new Error("서버 응답 오류: " + response.statusText);
                     }
                     const resultBlob = await response.blob();
-                    // blob을 data URL로 변환
                     const dataUrl = await new Promise(resolve => {
                         const reader = new FileReader();
                         reader.onloadend = () => resolve(reader.result);
                         reader.readAsDataURL(resultBlob);
                     });
-                    // 로컬 스토리지에 결과 이미지 저장
                     localStorage.setItem("aiDesignImage", dataUrl);
-                    // 2_AI.html로 이동
                     window.location.href = "2_AI.html";
                 } catch (error) {
                     console.error("서버 전송 실패:", error);
@@ -417,28 +490,21 @@
             document.addEventListener("DOMContentLoaded", function () {
                 const sizeSlider = document.getElementById("sizeSlider");
                 const sizePreview = document.getElementById("sizePreview");
-                const previewContainer = sizePreview.parentElement; // 부모 박스 참조
+                const previewContainer = sizePreview.parentElement;
         
                 function updateSizePreview() {
                     let size = sizeSlider.value;
-                    // 원(circle) 크기 변경
                     sizePreview.style.width = size + "px";
                     sizePreview.style.height = size + "px";
-                    // 원을 정중앙에 유지
                     sizePreview.style.display = "flex";
                     sizePreview.style.alignItems = "center";
                     sizePreview.style.justifyContent = "center";
-                    // 원 색상을 슬라이더 색상과 일치
                     sizePreview.style.backgroundColor = "#6366F1";
-                    // 부모 박스 크기는 고정 (Reference 박스와 동일)
-                    previewContainer.style.height = "200px";
+                    previewContainer.style.height = "100px";
                     previewContainer.style.width = "100%";
                 }
         
-                // 초기 크기 설정
                 updateSizePreview();
-        
-                // 슬라이더 변경 시 미리보기 업데이트
                 sizeSlider.addEventListener("input", updateSizePreview);
             });
         </script>
@@ -448,37 +514,29 @@
                 const uploadArea = document.querySelector(".upload-area");
                 const fileInput = document.createElement("input");
                 fileInput.type = "file";
-                fileInput.accept = "image/*"; // 이미지 파일만 허용
+                fileInput.accept = "image/*";
         
-                // 파일 찾기 버튼 클릭 이벤트
                 uploadArea.querySelector("button").addEventListener("click", function () {
                     fileInput.click();
                 });
         
-                // 파일 선택 시 처리
-                fileInput.addEventListener("change", function (event) {
-                    handleFileUpload(event.target.files[0]);
-                });
-        
-                // 드래그 앤 드롭 이벤트 추가
                 uploadArea.addEventListener("dragover", function (event) {
                     event.preventDefault();
-                    uploadArea.style.borderColor = "#A855F7"; // 드롭 영역 강조
+                    uploadArea.style.borderColor = "#A855F7";
                 });
         
                 uploadArea.addEventListener("dragleave", function () {
-                    uploadArea.style.borderColor = "#6366F1"; // 원래 색상으로 복귀
+                    uploadArea.style.borderColor = "#6366F1";
                 });
         
                 uploadArea.addEventListener("drop", function (event) {
                     event.preventDefault();
-                    uploadArea.style.borderColor = "#6366F1"; // 원래 색상으로 복귀
+                    uploadArea.style.borderColor = "#6366F1";
                     if (event.dataTransfer.files.length > 0) {
                         handleFileUpload(event.dataTransfer.files[0]);
                     }
                 });
         
-                // 파일 업로드 처리 함수
                 function handleFileUpload(file) {
                     if (!file.type.startsWith("image/")) {
                         alert("이미지 파일만 업로드 가능합니다!");
@@ -493,7 +551,6 @@
                             const ctx = canvas.getContext("2d");
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            // 파일 업로드 후 캔버스 상태를 로컬 스토리지에 저장
                             const dataUrl = canvas.toDataURL("image/png");
                             localStorage.setItem("savedCanvas", dataUrl);
                         };
@@ -510,23 +567,21 @@
                 const shareButton = document.getElementById("shareButton");
                 const canvas = document.getElementById("sketchCanvas");
         
-                // **저장하기 버튼 기능 (PNG 다운로드)**
                 saveButton.addEventListener("click", function () {
-                    const image = canvas.toDataURL("image/png"); // 캔버스를 이미지로 변환
+                    const image = canvas.toDataURL("image/png");
                     const link = document.createElement("a");
                     link.href = image;
-                    link.download = "sketch.png"; // 파일 이름 지정
+                    link.download = "sketch.png";
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
                 });
         
-                // **공유하기 버튼 기능 (클립보드에 이미지 복사)**
                 shareButton.addEventListener("click", async function () {
                     try {
                         const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
                         const item = new ClipboardItem({ "image/png": blob });
-                        await navigator.clipboard.write([item]); // 클립보드에 이미지 복사
+                        await navigator.clipboard.write([item]);
                         alert("이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");
                     } catch (err) {
                         console.error("이미지 복사 실패", err);
@@ -545,23 +600,19 @@
                 referenceItems.forEach(item => {
                     item.addEventListener('click', function() {
                         const imgSrc = this.getAttribute('src');
-                        console.log('이미지 클릭됨:', imgSrc); // 디버깅용
+                        console.log('이미지 클릭됨:', imgSrc);
                         
-                        // 이미지 로드 및 캔버스에 그리기
                         const img = new Image();
                         img.onload = function() {
-                            // 캔버스 초기화 (검은색 배경)
                             ctx.fillStyle = "#000000";
                             ctx.fillRect(0, 0, canvas.width, canvas.height);
                             
-                            // 이미지 캔버스에 그리기 (비율 유지하면서 중앙에 배치)
                             const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
                             const x = (canvas.width - img.width * scale) / 2;
                             const y = (canvas.height - img.height * scale) / 2;
                             
                             ctx.drawImage(img, 0, 0, img.width, img.height, x, y, img.width * scale, img.height * scale);
                             
-                            // 로컬 스토리지에 캔버스 데이터 저장
                             const dataUrl = canvas.toDataURL("image/png");
                             localStorage.setItem("savedCanvas", dataUrl);
                             console.log('이미지가 캔버스에 그려짐');
@@ -579,7 +630,6 @@
         </script>
         
         <script>
-            // References Carousel 기능 구현
             document.addEventListener("DOMContentLoaded", function() {
                 const carouselInner = document.getElementById("carouselInner");
                 const prevButton = document.getElementById("prevButton");
@@ -602,7 +652,6 @@
                     updateCarousel();
                 });
         
-                // 창 크기 변경 시 carouselInner의 폭이 바뀔 수 있으므로 재계산
                 window.addEventListener("resize", updateCarousel);
             });
         </script>
