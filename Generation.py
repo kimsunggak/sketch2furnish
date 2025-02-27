@@ -20,7 +20,7 @@ url = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/
 # API 요청에 사용할 데이터
 payload = {
     "prompt": final_prompt,
-    "style": "polaroid",
+    "style": "3d_animation",
     "num_inference_steps": 1,
     "width": 256,
     "height": 256,
