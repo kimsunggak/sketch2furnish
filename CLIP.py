@@ -54,7 +54,7 @@ url = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/
 payload = {
     "prompt": final_prompt,
     "conditioning_image": conditioning_image_base64,  # 스타일 유지용 조건 이미지
-    "style": "polaroid",
+    "style": "3d_animation",
     "num_inference_steps": 1,
     "width": 256,
     "height": 256,
@@ -65,7 +65,7 @@ payload = {
 headers = {
     "accept": "application/json",
     "content-type": "application/json",
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NDA1NDYyMjcsIm5iZiI6MTc0MDU0NjIyNywiZXhwIjoxNzUwNDYzOTk5LCJrZXlfaWQiOiI4NDE5M2JlMi0xOTllLTQ1NjUtOGJkNC1mYjcwMDRjYWViMzgifQ.Tt272G6boYh26O_WppZMy0PAlA77Ueay1Cq15EMW0GU"  # 실제 API 키로 교체
+    "Authorization": "Bearer YOUR_API_KEY"  # 실제 API 키로 교체
 }
 
 print("API 요청을 보내는 중...")
