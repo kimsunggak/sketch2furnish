@@ -13,6 +13,7 @@ from data.base_dataset import get_params, get_transform
 # opt 객체 생성 (TestOptions 기반)
 # ---------------------------
 from options.test_options import TestOptions
+import os
 opt = TestOptions().parse()
 print("Test Options:", opt)
 
@@ -32,8 +33,8 @@ model = networks.define_G(
 )
 model.to(device)
 
-# 모델 가중치 로드 (모델 파일 경로를 환경에 맞게 수정하세요)
-model_path = r"C:\Users\sunggak\Desktop\sketch2furnish\checkpoints\last_try\latest_net_G.pth"
+# 모델 가중치 로드 
+model_path = os.path.join("checkpoints", "furniture_pix2pix", "latest_net_G.pth")
 model.load_state_dict(torch.load(model_path, map_location=device))
 
 # ---------------------------
