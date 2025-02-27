@@ -31,7 +31,7 @@ payload = {
 headers = {
     "accept": "application/json",
     "content-type": "application/json",
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NDA1NDYyMjcsIm5iZiI6MTc0MDU0NjIyNywiZXhwIjoxNzUwNDYzOTk5LCJrZXlfaWQiOiI4NDE5M2JlMi0xOTllLTQ1NjUtOGJkNC1mYjcwMDRjYWViMzgifQ.Tt272G6boYh26O_WppZMy0PAlA77Ueay1Cq15EMW0GU"  # 실제 API 키로 교체
+    "Authorization": "Bearer YOUR_API_KEY"  # 실제 API 키로 교체
 }
 
 print("API 요청을 보내는 중...")
