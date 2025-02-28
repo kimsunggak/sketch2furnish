@@ -401,6 +401,14 @@
                 loadingIndicator.style.display = 'none';
                 previewImage.style.opacity = '1';
             }
+
+            // saveNewVersion 함수 정의
+            window.saveNewVersion = function(prompt, imageUrl) {
+                console.log("새 버전 저장:", prompt, imageUrl);
+                // 필요시 로컬스토리지에 정보 추가 저장
+                localStorage.setItem("lastPrompt", prompt);
+                localStorage.setItem("aiDesignImage", imageUrl);
+            };
         });
         
         // 페이지 이동 함수
@@ -498,7 +506,13 @@
                 const data = await response.json();
                 if (data.result_url) {
                     document.getElementById("designPreview").src = data.result_url;
-                    window.saveNewVersion(prompt, data.result_url);
+                    // 함수 존재 여부 확인 후 호출
+                    if (typeof window.saveNewVersion === 'function') {
+                        window.saveNewVersion(prompt, data.result_url);
+                    } else {
+                        console.warn("saveNewVersion 함수가 정의되지 않았습니다.");
+                        localStorage.setItem("aiDesignImage", data.result_url);
+                    }
                 } else {
                     alert("결과 이미지가 없습니다.");
                 }

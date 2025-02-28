@@ -397,24 +397,52 @@ async def recommend_furniture_endpoint(request: RecommendRequest):
         min_price = request.min_price
         max_price = request.max_price
         print(f"적용된 가격 필터 값 - 최소 가격: {min_price}, 최대 가격: {max_price}")
-        print(f"수신된 이미지 데이터 길이: {len(request.image_data)}")
         
+        # Base64 데이터 처리 코드 개선
         try:
-            # base64 디코딩 시 validate=True로 검증
-            image_bytes = base64.b64decode(request.image_data, validate=True)
-            # 디코딩한 이미지 데이터 길이 로깅
-            print(f"디코딩된 이미지 바이트 길이: {len(image_bytes)}")
-            # PIL 이미지 열기
-            image = Image.open(BytesIO(image_bytes)).convert("RGB")
-            print(f"이미지 열기 성공: 크기={image.size}, 모드={image.mode}")
+            print(f"수신된 이미지 데이터 길이: {len(request.image_data)}")
+            # 패딩 문자(=)가 없는 경우 추가
+            padded_data = request.image_data
+            padding = len(padded_data) % 4
+            if padding:
+                padded_data += '=' * (4 - padding)
+            
+            try:
+                # base64 디코딩
+                image_bytes = base64.b64decode(padded_data)
+                print(f"디코딩된 이미지 바이트 길이: {len(image_bytes)}")
+                
+                # 추가 디버깅 - 바이트 시작 부분 출력
+                print(f"바이트 시작: {image_bytes[:20]}")
+                
+                # 이미지 파일인지 확인 (헤더 검사)
+                if not (image_bytes.startswith(b'\xff\xd8') or  # JPEG
+                        image_bytes.startswith(b'\x89PNG') or   # PNG
+                        image_bytes.startswith(b'GIF') or       # GIF 
+                        image_bytes.startswith(b'BM')):         # BMP
+                    print("경고: 이미지 헤더가 인식되지 않습니다. 계속 진행합니다...")
+                
+                # PIL 이미지로 열기 시도
+                image = Image.open(BytesIO(image_bytes)).convert("RGB")
+                print(f"이미지 열기 성공: 크기={image.size}, 모드={image.mode}")
+                
+                # 임베딩 추출 및 추천 진행
+                query_embedding = extract_embedding(image)
+                recommended_furniture = find_similar_furniture(query_embedding, min_price, max_price)
+                print(f"최종 추천된 가구 개수: {len(recommended_furniture)}개")
+                return {"recommendations": recommended_furniture}
+                
+            except Exception as e:
+                print(f"이미지 처리 실패: {str(e)}")
+                # 추가 디버깅 - 오류가 발생한 경우 더 자세한 정보
+                import traceback
+                traceback.print_exc()
+                raise HTTPException(status_code=400, detail=f"이미지 처리 오류: {str(e)}")
+                
         except Exception as e:
-            raise HTTPException(status_code=400,
-                detail=f"이미지 처리 오류: {str(e)} (원본 데이터 길이: {len(request.image_data)})")
-        
-        query_embedding = extract_embedding(image)
-        recommended_furniture = find_similar_furniture(query_embedding, min_price, max_price)
-        print(f"최종 추천된 가구 개수: {len(recommended_furniture)}개")
-        return {"recommendations": recommended_furniture}
+            print(f"Base64 데이터 처리 실패: {str(e)}")
+            raise HTTPException(status_code=400, detail=f"이미지 데이터 처리 오류: {str(e)}")
+            
     except Exception as e:
         print(f"추천 과정에서 오류 발생: {str(e)}")
         import traceback
