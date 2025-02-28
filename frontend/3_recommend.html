@@ -247,88 +247,115 @@
                 requestRecommendations();
             });
             
-            // 추천 요청 함수 수정 - 이미지 URL이 아닌 곳에서도 잘 동작하도록 수정
+            // 추천 요청 함수를 완전히 개선한 버전
             async function requestRecommendations() {
                 const storedImage = localStorage.getItem('aiDesignImage');
                 if (!storedImage) {
-                    showError("추천에 사용할 이미지가 없습니다.");
+                    showError("추천에 사용할 이미지가 없습니다."); 
                     return;
                 }
                 
-                // 가격 범위 가져오기 및 유효성 검사
+                // 가격 범위 가져오기
                 const minPrice = parseInt(document.getElementById('minPrice').value) || 0;
                 const maxPrice = parseInt(document.getElementById('maxPrice').value) || 100000000;
-                if (minPrice < 0) {
-                    alert("최소 가격은 0 이상이어야 합니다.");
-                    return;
-                }
-                if (maxPrice < minPrice) {
-                    alert("최대 가격은 최소 가격보다 커야 합니다.");
+                
+                // 유효성 검사
+                if (minPrice < 0 || (maxPrice > 0 && minPrice > maxPrice)) {
+                    alert("유효하지 않은 가격 범위입니다. 다시 확인해주세요.");
                     return;
                 }
                 
                 showLoading();
                 
-                // 이미지 데이터를 적절하게 처리
-                let imageData;
                 try {
-                    // data:image/... 형식의 데이터 URL인 경우
-                    if (storedImage.startsWith('data:image')) {
-                        // base64 부분만 추출
-                        imageData = storedImage.split('base64,')[1];
-                        console.log("데이터 URL에서 base64 데이터 추출 완료");
-                    }
-                    // https://... 형식의 URL인 경우
-                    else if (storedImage.startsWith('http')) {
-                        // CORS 오류 방지를 위해 임시 캔버스에 그려서 base64로 변환
-                        console.log("URL에서 이미지 가져와 캔버스에 그리기");
-                        await drawImageOnCanvas(storedImage);
-                        const canvas = document.getElementById('viewerCanvas');
-                        imageData = canvas.toDataURL('image/png').split('base64,')[1];
-                        console.log("캔버스에서 base64 데이터 추출 완료");
-                    }
-                    // 이미 base64 문자열인 경우
-                    else {
-                        imageData = storedImage;
-                        console.log("이미 base64 형식의 데이터 사용");
-                    }
-
-                    // 디버깅 출력 (일부만)
-                    console.log(`처리된 이미지 데이터 (앞 20자): ${imageData.substring(0, 20)}...`);
+                    // 이미지 데이터 준비
+                    let base64Data;
                     
-                    // 서버에 요청
-                    fetch('https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/recommend', {
+                    // 1. 데이터 URL인 경우 (data:image/jpeg;base64,...)
+                    if (storedImage.startsWith('data:image')) {
+                        console.log("데이터 URL 감지: base64 형식 추출 시작");
+                        base64Data = storedImage.split(',')[1]; // base64 부분만 추출
+                    }
+                    // 2. 외부 URL인 경우 (http://..)
+                    else if (storedImage.startsWith('http')) {
+                        console.log("URL 감지: 이미지 다운로드 후 처리");
+                        try {
+                            // 캔버스에 그려서 안정적으로 변환
+                            const canvas = document.getElementById('viewerCanvas');
+                            const ctx = canvas.getContext('2d');
+                            
+                            // 이미지 로드
+                            const img = new Image();
+                            img.crossOrigin = 'anonymous';
+                            
+                            // 이미지 로드 대기를 위한 Promise
+                            await new Promise((resolve, reject) => {
+                                img.onload = resolve;
+                                img.onerror = reject;
+                                img.src = storedImage;
+                            });
+                            
+                            // 캔버스 크기 설정 및 그리기
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            ctx.drawImage(img, 0, 0);
+                            
+                            // 캔버스에서 데이터 URL 추출 후 base64만 분리
+                            const dataURL = canvas.toDataURL('image/png');
+                            base64Data = dataURL.split(',')[1];
+                            console.log("URL에서 캔버스 변환 완료");
+                        } catch (err) {
+                            console.error("URL 이미지 변환 실패:", err);
+                            showError("이미지를 변환하는 과정에서 오류가 발생했습니다.");
+                            return;
+                        }
+                    }
+                    // 3. 이미 Base64 문자열인 경우 (이론적으로만 가능)
+                    else {
+                        console.log("Base64 문자열로 추정: 직접 사용");
+                        base64Data = storedImage;
+                    }
+                    
+                    // base64 데이터 길이 검증
+                    if (!base64Data || base64Data.length < 100) {
+                        console.error("데이터가 너무 짧거나 없음:", base64Data?.length);
+                        showError("유효한 이미지 데이터가 아닙니다.");
+                        return;
+                    }
+                    
+                    console.log(`Base64 데이터 준비 완료 (길이: ${base64Data.length})`);
+                    
+                    // 서버 요청
+                    const response = await fetch('https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/recommend', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            image_data: imageData,
+                            image_data: base64Data,
                             min_price: minPrice,
                             max_price: maxPrice
                         })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.text().then(text => { throw new Error(`서버 오류 (${response.status}): ${text}`); });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.recommendations && data.recommendations.length > 0) {
-                            displayRecommendations(data.recommendations);
-                        } else {
-                            displayRecommendations([]);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('추천 과정에서 오류 발생:', error);
-                        showError(error.message || "추천 요청이 실패했습니다.");
                     });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`서버 오류 (${response.status}): ${errorText}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log("추천 결과:", data);
+                    
+                    if (data.recommendations && data.recommendations.length > 0) {
+                        displayRecommendations(data.recommendations);
+                    } else {
+                        displayRecommendations([]);
+                    }
                 } catch (error) {
-                    console.error('이미지 데이터 처리 중 오류:', error);
-                    showError(`이미지 처리 오류: ${error.message}`);
+                    console.error("추천 과정에서 오류:", error);
+                    showError(error.message || "추천 요청 중 문제가 발생했습니다.");
                 }
             }
-
+            
             // URL 이미지를 캔버스로 로드하는 함수 추가
             async function drawImageOnCanvas(imageUrl) {
                 return new Promise((resolve, reject) => {

@@ -387,6 +387,7 @@ class RecommendRequest(BaseModel):
     min_price: int = 0
     max_price: int = 100000000
 
+# recommend 엔드포인트 수정
 @app.post("/recommend")
 async def recommend_furniture_endpoint(request: RecommendRequest):
     """
@@ -398,33 +399,53 @@ async def recommend_furniture_endpoint(request: RecommendRequest):
         max_price = request.max_price
         print(f"적용된 가격 필터 값 - 최소 가격: {min_price}, 최대 가격: {max_price}")
         
-        # Base64 데이터 처리 코드 개선
+        # 이미지 데이터 처리 시작
         try:
-            print(f"수신된 이미지 데이터 길이: {len(request.image_data)}")
-            # 패딩 문자(=)가 없는 경우 추가
-            padded_data = request.image_data
-            padding = len(padded_data) % 4
-            if padding:
-                padded_data += '=' * (4 - padding)
+            image_data = request.image_data
+            print(f"수신된 이미지 데이터 길이: {len(image_data)} bytes")
             
+            # 패딩 검사 및 수정
+            missing_padding = 4 - len(image_data) % 4
+            if missing_padding < 4:
+                image_data += '=' * missing_padding
+                print(f"패딩 추가: {missing_padding}개")
+                
+            # Base64 디코딩
             try:
-                # base64 디코딩
-                image_bytes = base64.b64decode(padded_data)
-                print(f"디코딩된 이미지 바이트 길이: {len(image_bytes)}")
+                image_bytes = base64.b64decode(image_data, validate=True)
+                print(f"Base64 디코딩 성공: {len(image_bytes)} bytes")
                 
-                # 추가 디버깅 - 바이트 시작 부분 출력
-                print(f"바이트 시작: {image_bytes[:20]}")
+                # 이미지 파일 헤더 검증 (옵션)
+                if len(image_bytes) > 10:
+                    header = image_bytes[:12]
+                    hex_header = ' '.join(f'{b:02x}' for b in header)
+                    print(f"이미지 헤더 (hex): {hex_header}")
                 
-                # 이미지 파일인지 확인 (헤더 검사)
-                if not (image_bytes.startswith(b'\xff\xd8') or  # JPEG
-                        image_bytes.startswith(b'\x89PNG') or   # PNG
-                        image_bytes.startswith(b'GIF') or       # GIF 
-                        image_bytes.startswith(b'BM')):         # BMP
-                    print("경고: 이미지 헤더가 인식되지 않습니다. 계속 진행합니다...")
+                # 명시적으로 BytesIO 객체로 변환
+                image_stream = BytesIO(image_bytes)
+                image_stream.seek(0)  # 스트림 위치 리셋
                 
-                # PIL 이미지로 열기 시도
-                image = Image.open(BytesIO(image_bytes)).convert("RGB")
-                print(f"이미지 열기 성공: 크기={image.size}, 모드={image.mode}")
+                # 다양한 이미지 형식 지원 시도
+                try:
+                    image = Image.open(image_stream)
+                    # 이미지 정보 출력
+                    print(f"이미지 열기 성공: 사이즈={image.size}, 모드={image.mode}, 형식={image.format}")
+                    
+                    # RGB로 변환 확실히
+                    if image.mode != "RGB":
+                        image = image.convert("RGB")
+                        print("이미지를 RGB 모드로 변환했습니다.")
+                    
+                except Exception as img_err:
+                    print(f"PIL 이미지 열기 실패: {str(img_err)}")
+                    
+                    # 디버깅을 위해 잘못된 이미지 저장
+                    debug_file = f"/tmp/debug_image_{int(time.time())}.bin"
+                    with open(debug_file, 'wb') as df:
+                        df.write(image_bytes)
+                    print(f"디버그용 파일 저장됨: {debug_file}")
+                    
+                    raise HTTPException(status_code=400, detail=f"이미지 형식 오류: {str(img_err)}")
                 
                 # 임베딩 추출 및 추천 진행
                 query_embedding = extract_embedding(image)
@@ -432,19 +453,18 @@ async def recommend_furniture_endpoint(request: RecommendRequest):
                 print(f"최종 추천된 가구 개수: {len(recommended_furniture)}개")
                 return {"recommendations": recommended_furniture}
                 
-            except Exception as e:
-                print(f"이미지 처리 실패: {str(e)}")
-                # 추가 디버깅 - 오류가 발생한 경우 더 자세한 정보
-                import traceback
-                traceback.print_exc()
-                raise HTTPException(status_code=400, detail=f"이미지 처리 오류: {str(e)}")
+            except binascii.Error as b64_err:
+                print(f"Base64 디코딩 오류: {str(b64_err)}")
+                raise HTTPException(status_code=400, detail=f"잘못된 Base64 인코딩: {str(b64_err)}")
                 
-        except Exception as e:
-            print(f"Base64 데이터 처리 실패: {str(e)}")
-            raise HTTPException(status_code=400, detail=f"이미지 데이터 처리 오류: {str(e)}")
+        except Exception as img_proc_err:
+            print(f"이미지 처리 중 예외 발생: {str(img_proc_err)}")
+            import traceback
+            traceback.print_exc()
+            raise HTTPException(status_code=400, detail=f"이미지 처리 오류: {str(img_proc_err)}")
             
     except Exception as e:
-        print(f"추천 과정에서 오류 발생: {str(e)}")
+        print(f"추천 과정에서 일반 오류 발생: {str(e)}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"가구 추천 중 오류 발생: {str(e)}")
