@@ -397,37 +397,29 @@ async def recommend_furniture_endpoint(request: RecommendRequest):
         min_price = request.min_price
         max_price = request.max_price
         print(f"적용된 가격 필터 값 - 최소 가격: {min_price}, 최대 가격: {max_price}")
-        
-        # 디버깅 정보 추가
-        print(f"수신된 이미지 데이터 길이: {len(request.image_data[:50])}...")
+        print(f"수신된 이미지 데이터 길이: {len(request.image_data)}")
         
         try:
-            # Base64 이미지 디코딩
-            image_bytes = base64.b64decode(request.image_data)
-            # 이미지 열기
+            # base64 디코딩 시 validate=True로 검증
+            image_bytes = base64.b64decode(request.image_data, validate=True)
+            # 디코딩한 이미지 데이터 길이 로깅
+            print(f"디코딩된 이미지 바이트 길이: {len(image_bytes)}")
+            # PIL 이미지 열기
             image = Image.open(BytesIO(image_bytes)).convert("RGB")
             print(f"이미지 열기 성공: 크기={image.size}, 모드={image.mode}")
         except Exception as e:
-            print(f"이미지 처리 오류: {str(e)}")
-            return JSONResponse(
-                status_code=400,
-                content={"error": f"이미지 처리 오류: {str(e)}"}
-            )
+            raise HTTPException(status_code=400,
+                detail=f"이미지 처리 오류: {str(e)} (원본 데이터 길이: {len(request.image_data)})")
         
-        # 이미지 임베딩 추출
         query_embedding = extract_embedding(image)
-        
-        # 유사 가구 검색
         recommended_furniture = find_similar_furniture(query_embedding, min_price, max_price)
         print(f"최종 추천된 가구 개수: {len(recommended_furniture)}개")
-        
         return {"recommendations": recommended_furniture}
     except Exception as e:
         print(f"추천 과정에서 오류 발생: {str(e)}")
-        return JSONResponse(
-            status_code=500, 
-            content={"error": f"가구 추천 중 오류 발생: {str(e)}"}
-        )
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"가구 추천 중 오류 발생: {str(e)}")
 
 @app.get("/image/{filename}")
 async def get_image(filename: str):
