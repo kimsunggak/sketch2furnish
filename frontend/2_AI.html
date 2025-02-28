@@ -405,10 +405,14 @@
         
         // 페이지 이동 함수
         function goToPage() {
+            // 이미 생성된 이미지(예: design canvas에서 얻은 base64 데이터)를 localStorage에 저장
             const previewImage = document.getElementById("designPreview");
-            if (previewImage.src) {
-                localStorage.setItem("aiDesignImage", previewImage.src);
+            if (!previewImage.src || previewImage.src === "about:blank") {
+                alert("생성된 이미지가 없습니다. 먼저 이미지를 생성해주세요.");
+                return;
             }
+            localStorage.setItem("aiDesignImage", previewImage.src);
+            // 서버 저장 없이 바로 추천페이지로 이동
             window.location.href = "3_recommend.html";
         }
     </script>

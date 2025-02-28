@@ -249,16 +249,15 @@
             
             // 추천 요청 함수
             function requestRecommendations() {
+                const storedImage = localStorage.getItem('aiDesignImage');
                 if (!storedImage) {
                     showError("추천에 사용할 이미지가 없습니다.");
                     return;
                 }
                 
-                // 가격 범위 가져오기
+                // 가격 범위 가져오기 및 검증
                 const minPrice = parseInt(document.getElementById('minPrice').value) || 0;
                 const maxPrice = parseInt(document.getElementById('maxPrice').value) || 100000000;
-                
-                // 가격 유효성 검증
                 if (minPrice < 0) {
                     alert("최소 가격은 0 이상이어야 합니다.");
                     return;
@@ -268,67 +267,40 @@
                     return;
                 }
                 
-                // 로딩 표시
                 showLoading();
                 
-                // Base64 이미지 데이터 준비 (수정된 부분)
+                // storedImage가 data URL이면 base64 부분만 추출
                 let imageData = storedImage;
-                if (!imageData) {
-                    showError("추천에 사용할 이미지가 없습니다.");
-                    return;
+                if (imageData.includes('base64,')) {
+                    imageData = imageData.split('base64,')[1];
                 }
-
-                // 디버깅을 위한 로그
-                console.log("원본 이미지 데이터:", imageData.substring(0, 50) + "...");
                 
-                // Base64 데이터 추출 (수정된 부분)
-                try {
-                    // data:image/png;base64, 또는 data:image/jpeg;base64, 부분 제거
-                    if (imageData.includes('base64,')) {
-                        imageData = imageData.split('base64,')[1];
+                fetch('https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/recommend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image_data: imageData,
+                        min_price: minPrice,
+                        max_price: maxPrice
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(`서버 오류 (${response.status}): ${text}`); });
                     }
-                    
-                    console.log("처리된 Base64 데이터:", imageData.substring(0, 50) + "...");
-                    
-                    // 서버에 요청 보내기
-                    fetch('https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/recommend', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            image_data: imageData,
-                            min_price: minPrice,
-                            max_price: maxPrice
-                        })
-                    })
-                    .then(response => {
-                        console.log("서버 응답 상태:", response.status);
-                        if (!response.ok) {
-                            return response.text().then(text => {
-                                throw new Error(`서버 오류 (${response.status}): ${text}`);
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log("추천 데이터 수신:", data);
-                        if (data.recommendations && data.recommendations.length > 0) {
-                            console.log(`추천 결과 ${data.recommendations.length}개 표시`);
-                            displayRecommendations(data.recommendations);
-                        } else {
-                            console.log("추천 결과가 없습니다");
-                            displayRecommendations([]); // 빈 배열 전달
-                        }
-                    })
-                    .catch(error => {
-                        console.error('추천 과정에서 오류 발생:', error);
-                        showError(error.message || "추천 요청이 실패했습니다. 서버가 실행 중인지 확인해주세요.");
-                    });
-                } catch (error) {
-                    console.error("이미지 데이터 처리 중 오류:", error);
-                    showError("이미지 데이터 처리 중 오류가 발생했습니다.");
-                }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.recommendations && data.recommendations.length > 0) {
+                        displayRecommendations(data.recommendations);
+                    } else {
+                        displayRecommendations([]);
+                    }
+                })
+                .catch(error => {
+                    console.error('추천 과정에서 오류 발생:', error);
+                    showError(error.message || "추천 요청이 실패했습니다.");
+                });
             }
             
             // 프로젝트 저장 버튼 이벤트
