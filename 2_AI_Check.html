@@ -319,48 +319,41 @@
         }
     </script>
     
-    <!-- 맞춤법 검사기 연동 스크립트: 결과를 Design Feedback 박스 내의 영역에 표시 -->
+    <!-- 맞춤법 검사기 연동 스크립트: 실시간 검사 (수정된 문장만 결과 표시) -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const feedbackBtn = document.getElementById("feedbackBtn");
-            feedbackBtn.addEventListener("click", function() {
-                const feedbackText = document.getElementById("feedbackText").value;
-                const resultBox = document.getElementById("spellResult");
-                if (!feedbackText.trim()) {
-                    resultBox.textContent = "수정사항을 입력해주세요.";
-                    return;
-                }
-                fetch("http://localhost:5000/check", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: feedbackText })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        resultBox.textContent = "오류 발생: " + data.error;
-                    } else {
-                        let resultText = "";
-                        if(data.errors === 0) {
-                            resultText = `입력하신 문장 "${data.original_text}"은(는) 맞춤법 오류가 없습니다.`;
-                        } else {
-                            resultText += `입력하신 문장: "${data.original_text}"\n`;
-                            resultText += `수정된 문장: "${data.checked_text}"\n`;
-                            resultText += `총 오류 수: ${data.errors}\n\n`;
-                            resultText += "오류 단어:\n";
-                            for(const word in data.words) {
-                                if(data.words[word] > 0) {
-                                    resultText += `- ${word}: ${data.words[word]}회 오류\n`;
-                                }
-                            }
-                        }
-                        resultBox.textContent = resultText;
+            const feedbackTextEl = document.getElementById("feedbackText");
+            const resultBox = document.getElementById("spellResult");
+            let debounceTimer;
+
+            // 입력이 발생할 때마다(0.5초 디바운스) 맞춤법 검사 API 호출
+            feedbackTextEl.addEventListener("input", function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const text = feedbackTextEl.value;
+                    if (!text.trim()) {
+                        resultBox.textContent = "수정사항을 입력해주세요.";
+                        return;
                     }
-                })
-                .catch(error => {
-                    console.error("오류 발생:", error);
-                    resultBox.textContent = "오류가 발생했습니다.";
-                });
+                    fetch("http://localhost:5000/check", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ text: text })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            resultBox.textContent = "오류 발생: " + data.error;
+                        } else {
+                            // ★ 수정된 문장만 표시 ★
+                            resultBox.textContent = data.checked_text;
+                        }
+                    })
+                    .catch(error => {
+                        console.error("오류 발생:", error);
+                        resultBox.textContent = "오류가 발생했습니다.";
+                    });
+                }, 500);
             });
         });
     </script>
