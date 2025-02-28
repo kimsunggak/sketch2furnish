@@ -144,91 +144,80 @@
     
     <!-- JavaScript: 추천 기능 구현 -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const viewerCanvas = document.getElementById('viewerCanvas');
-            const ctx = viewerCanvas.getContext('2d');
-            const storedImage = localStorage.getItem('aiDesignImage');
-            const applyPriceFilterButton = document.getElementById('applyPriceFilter');
-            const recommendationsContainer = document.querySelector('.grid-cols-2');
-            
-            // 로딩 상태 UI 컴포넌트
-            function showLoading() {
+    document.addEventListener('DOMContentLoaded', function () {
+        const viewerCanvas = document.getElementById('viewerCanvas');
+        const ctx = viewerCanvas.getContext('2d');
+        const storedImage = localStorage.getItem('aiDesignImage');
+        const applyPriceFilterButton = document.getElementById('applyPriceFilter');
+        const recommendationsContainer = document.querySelector('.grid-cols-2');
+        
+        // 로딩 상태 UI 컴포넌트
+        function showLoading() {
+            recommendationsContainer.innerHTML = `
+                <div class="col-span-2 text-center py-10">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+                    <p class="mt-4 text-gray-700">가구를 추천 중입니다...</p>
+                </div>
+            `;
+        }
+        
+        // 오류 표시 함수
+        function showError(message) {
+            recommendationsContainer.innerHTML = `
+                <div class="col-span-2 text-center py-10">
+                    <svg class="mx-auto h-12 w-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p class="mt-4 text-red-500">${message}</p>
+                </div>
+            `;
+        }
+        
+        // 추천 결과 표시 함수 (기존 코드 유지)
+        function displayRecommendations(products) {
+            if (!products || products.length === 0) {
                 recommendationsContainer.innerHTML = `
                     <div class="col-span-2 text-center py-10">
-                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-                        <p class="mt-4 text-gray-700">가구를 추천 중입니다...</p>
+                        <p class="text-gray-700">해당 조건의 추천 가구를 찾을 수 없습니다.</p>
                     </div>
                 `;
+                return;
             }
             
-            // 오류 표시 함수
-            function showError(message) {
-                recommendationsContainer.innerHTML = `
-                    <div class="col-span-2 text-center py-10">
-                        <svg class="mx-auto h-12 w-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <p class="mt-4 text-red-500">${message}</p>
-                    </div>
-                `;
-            }
-            
-            // 추천 결과 표시 함수
-            function displayRecommendations(products) {
-                if (!products || products.length === 0) {
-                    recommendationsContainer.innerHTML = `
-                        <div class="col-span-2 text-center py-10">
-                            <p class="text-gray-700">해당 조건의 추천 가구를 찾을 수 없습니다.</p>
-                        </div>
-                    `;
-                    return;
+            // 기존 결과 표시 코드...
+            recommendationsContainer.innerHTML = '';
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-gray-50 rounded-xl p-4 shadow card-hover';
+                
+                let imgSrc = '';
+                try {
+                    imgSrc = `https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/image/${encodeURIComponent(product.filename)}`;
+                } catch (e) {
+                    imgSrc = "img/product_placeholder.png";
                 }
                 
-                recommendationsContainer.innerHTML = '';
-                products.forEach(product => {
-                    const productCard = document.createElement('div');
-                    productCard.className = 'bg-gray-50 rounded-xl p-4 shadow card-hover';
-                    
-                    // 이미지 경로 오류 처리 추가
-                    let imgSrc = '';
-                    try {
-                        // URL 변경: 서버 주소 통일
-                        imgSrc = `https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/image/${encodeURIComponent(product.filename)}`;
-                    } catch (e) {
-                        console.error("이미지 경로 생성 오류:", e);
-                        imgSrc = "img/product_placeholder.png"; // 기본 이미지
-                    }
-                    
-                    productCard.innerHTML = `
-                        <img src="${imgSrc}" 
-                             alt="${product.category || '가구'}" 
-                             class="w-full h-40 object-cover rounded-md mb-4"
-                             onerror="this.onerror=null; this.src='img/product_placeholder.png';">
-                        <h4 class="font-bold text-gray-700">${product.category || '가구'}</h4>
-                        <p class="text-sm text-gray-500">${product.price || "가격 정보 없음"} | ${product.brand || "브랜드 정보 없음"}</p>
-                        <a href="${product.coupang_link || "#"}" target="_blank" 
-                           class="mt-2 text-indigo-600 text-sm block hover:underline">
-                           제품 보기
-                        </a>
-                    `;
-                    recommendationsContainer.appendChild(productCard);
-                });
-            }
-            
-            // 이미지 로드 시 캔버스에 그리기
-            if (storedImage) {
-                const img = new Image();
-                img.onload = function() {
-                    viewerCanvas.width = img.width;
-                    viewerCanvas.height = img.height;
-                    ctx.drawImage(img, 0, 0, viewerCanvas.width, viewerCanvas.height);
-                    
-                    // 이미지 로드 후 자동으로 추천 요청
-                    requestRecommendations();
-                };
-                img.src = storedImage;
-            } else {
+                productCard.innerHTML = `
+                    <img src="${imgSrc}" 
+                         alt="${product.category || '가구'}" 
+                         class="w-full h-40 object-cover rounded-md mb-4"
+                         onerror="this.onerror=null; this.src='img/product_placeholder.png';">
+                    <h4 class="font-bold text-gray-700">${product.category || '가구'}</h4>
+                    <p class="text-sm text-gray-500">${product.price || "가격 정보 없음"} | ${product.brand || "브랜드 정보 없음"}</p>
+                    <a href="${product.coupang_link || "#"}" target="_blank" 
+                       class="mt-2 text-indigo-600 text-sm block hover:underline">
+                       제품 보기
+                    </a>
+                `;
+                recommendationsContainer.appendChild(productCard);
+            });
+        }
+        
+        // 해결책 1: 페이지 로드 시 더 안정적인 이미지 처리 방식 구현
+        async function loadAndProcessImage() {
+            if (!storedImage) {
+                // 이미지가 없는 경우 처리
                 viewerCanvas.width = 500;
                 viewerCanvas.height = 500;
                 ctx.fillStyle = "#f3f4f6";
@@ -240,21 +229,95 @@
                 ctx.fillText("먼저 AI 디자인 생성을 완료해주세요.", viewerCanvas.width/2, viewerCanvas.height/2 + 30);
                 
                 showError("이미지가 없습니다. AI 디자인을 먼저 생성해주세요.");
+                return;
             }
             
-            // 가격 필터 적용 버튼 클릭 이벤트
-            applyPriceFilterButton.addEventListener('click', function() {
-                requestRecommendations();
-            });
-            
-            // 추천 요청 함수를 완전히 개선한 버전
-            async function requestRecommendations() {
-                const storedImage = localStorage.getItem('aiDesignImage');
-                if (!storedImage) {
-                    showError("추천에 사용할 이미지가 없습니다."); 
-                    return;
+            try {
+                console.log("이미지 로드 시작...");
+                
+                // 이미지 타입에 따른 처리
+                if (storedImage.startsWith('data:image')) {
+                    // data URL인 경우
+                    console.log("Data URL 형식 감지됨");
+                    await loadImageFromDataURL(storedImage);
+                } else if (storedImage.startsWith('http')) {
+                    // 외부 URL인 경우
+                    console.log("HTTP URL 형식 감지됨");
+                    await loadImageFromURL(storedImage);
+                } else {
+                    // 그 외 (plain base64 등)
+                    console.log("다른 형식의 데이터 감지됨, data URL로 변환 시도");
+                    await loadImageFromDataURL('data:image/png;base64,' + storedImage);
                 }
                 
+                // 이미지 로드 완료 후 추천 요청 시작
+                console.log("이미지 로드 완료, 추천 요청 시작");
+                await requestRecommendations();
+                
+            } catch (error) {
+                console.error("이미지 로드 실패:", error);
+                showError("이미지 로드에 실패했습니다: " + error.message);
+            }
+        }
+        
+        // 이미지 URL로부터 이미지 로드 함수
+        async function loadImageFromURL(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous"; // CORS 이슈 방지
+                
+                img.onload = function() {
+                    console.log("이미지 로드됨:", img.width, "x", img.height);
+                    // 캔버스 크기 설정
+                    viewerCanvas.width = img.width || 512;
+                    viewerCanvas.height = img.height || 512;
+                    
+                    // 이미지 그리기
+                    ctx.clearRect(0, 0, viewerCanvas.width, viewerCanvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    
+                    resolve();
+                };
+                
+                img.onerror = function(e) {
+                    console.error("이미지 URL 로드 실패:", e);
+                    reject(new Error("이미지 로드에 실패했습니다"));
+                };
+                
+                img.src = url;
+            });
+        }
+        
+        // data URL로부터 이미지 로드 함수
+        async function loadImageFromDataURL(dataURL) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                
+                img.onload = function() {
+                    console.log("Data URL 이미지 로드됨:", img.width, "x", img.height);
+                    // 캔버스 크기 설정
+                    viewerCanvas.width = img.width || 512;
+                    viewerCanvas.height = img.height || 512;
+                    
+                    // 이미지 그리기
+                    ctx.clearRect(0, 0, viewerCanvas.width, viewerCanvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    
+                    resolve();
+                };
+                
+                img.onerror = function(e) {
+                    console.error("Data URL 이미지 로드 실패:", e);
+                    reject(new Error("Data URL 이미지 처리에 실패했습니다"));
+                };
+                
+                img.src = dataURL;
+            });
+        }
+        
+        // 해결책 2: 더 안정적인 추천 요청 및 base64 변환 과정
+        async function requestRecommendations() {
+            try {
                 // 가격 범위 가져오기
                 const minPrice = parseInt(document.getElementById('minPrice').value) || 0;
                 const maxPrice = parseInt(document.getElementById('maxPrice').value) || 100000000;
@@ -265,153 +328,97 @@
                     return;
                 }
                 
+                // 로딩 표시 시작
                 showLoading();
                 
-                try {
-                    // 이미지 데이터 준비
-                    let base64Data;
-                    
-                    // 1. 데이터 URL인 경우 (data:image/jpeg;base64,...)
-                    if (storedImage.startsWith('data:image')) {
-                        console.log("데이터 URL 감지: base64 형식 추출 시작");
-                        base64Data = storedImage.split(',')[1]; // base64 부분만 추출
-                    }
-                    // 2. 외부 URL인 경우 (http://..)
-                    else if (storedImage.startsWith('http')) {
-                        console.log("URL 감지: 이미지 다운로드 후 처리");
-                        try {
-                            // 캔버스에 그려서 안정적으로 변환
-                            const canvas = document.getElementById('viewerCanvas');
-                            const ctx = canvas.getContext('2d');
-                            
-                            // 이미지 로드
-                            const img = new Image();
-                            img.crossOrigin = 'anonymous';
-                            
-                            // 이미지 로드 대기를 위한 Promise
-                            await new Promise((resolve, reject) => {
-                                img.onload = resolve;
-                                img.onerror = reject;
-                                img.src = storedImage;
-                            });
-                            
-                            // 캔버스 크기 설정 및 그리기
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            ctx.drawImage(img, 0, 0);
-                            
-                            // 캔버스에서 데이터 URL 추출 후 base64만 분리
-                            const dataURL = canvas.toDataURL('image/png');
-                            base64Data = dataURL.split(',')[1];
-                            console.log("URL에서 캔버스 변환 완료");
-                        } catch (err) {
-                            console.error("URL 이미지 변환 실패:", err);
-                            showError("이미지를 변환하는 과정에서 오류가 발생했습니다.");
-                            return;
-                        }
-                    }
-                    // 3. 이미 Base64 문자열인 경우 (이론적으로만 가능)
-                    else {
-                        console.log("Base64 문자열로 추정: 직접 사용");
-                        base64Data = storedImage;
-                    }
-                    
-                    // base64 데이터 길이 검증
-                    if (!base64Data || base64Data.length < 100) {
-                        console.error("데이터가 너무 짧거나 없음:", base64Data?.length);
-                        showError("유효한 이미지 데이터가 아닙니다.");
-                        return;
-                    }
-                    
-                    console.log(`Base64 데이터 준비 완료 (길이: ${base64Data.length})`);
-                    
-                    // 서버 요청
-                    const response = await fetch('https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/recommend', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            image_data: base64Data,
-                            min_price: minPrice,
-                            max_price: maxPrice
-                        })
-                    });
-                    
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`서버 오류 (${response.status}): ${errorText}`);
-                    }
-                    
-                    const data = await response.json();
-                    console.log("추천 결과:", data);
-                    
-                    if (data.recommendations && data.recommendations.length > 0) {
-                        displayRecommendations(data.recommendations);
-                    } else {
-                        displayRecommendations([]);
-                    }
-                } catch (error) {
-                    console.error("추천 과정에서 오류:", error);
-                    showError(error.message || "추천 요청 중 문제가 발생했습니다.");
-                }
-            }
-            
-            // URL 이미지를 캔버스로 로드하는 함수 추가
-            async function drawImageOnCanvas(imageUrl) {
-                return new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.crossOrigin = "anonymous"; // CORS 정책 대응
-                    img.onload = function() {
-                        const canvas = document.getElementById('viewerCanvas');
-                        const ctx = canvas.getContext('2d');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0);
-                        resolve();
-                    };
-                    img.onerror = function(e) {
-                        reject(new Error("이미지 로드 실패: " + e.message));
-                    };
-                    img.src = imageUrl;
-                });
-            }
-            
-            // 프로젝트 저장 버튼 이벤트
-            const saveProjectButton = document.getElementById("saveProjectButton");
-            saveProjectButton.addEventListener("click", function () {
-                if (storedImage) {
-                    const link = document.createElement("a");
-                    link.href = storedImage;
-                    link.download = "dream_furniture.png";
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } else {
-                    alert("저장할 이미지가 없습니다.");
-                }
-            });
-            
-            // 프로젝트 공유 버튼 이벤트
-            const shareProjectButton = document.getElementById("shareProjectButton");
-            shareProjectButton.addEventListener("click", async function () {
-                if (!storedImage) {
-                    alert("공유할 이미지가 없습니다.");
-                    return;
+                // 항상 캔버스에서 현재 이미지를 가져오는 방식으로 통일
+                console.log("캔버스에서 이미지 데이터 추출 시작...");
+                
+                // 캔버스에서 이미지 데이터 추출
+                const canvasDataURL = viewerCanvas.toDataURL('image/jpeg', 0.8); // JPEG으로 변환하여 크기 줄이기
+                console.log("캔버스에서 Data URL 추출 완료 (길이:", canvasDataURL.length, ")");
+                
+                // Base64 부분만 추출
+                const base64Data = canvasDataURL.split(',')[1];
+                if (!base64Data) {
+                    throw new Error("이미지 데이터 추출 실패");
                 }
                 
-                try {
-                    // 이미지 URL에서 Blob 생성
-                    const response = await fetch(storedImage);
-                    const blob = await response.blob();
-                    const item = new ClipboardItem({ "image/png": blob });
-                    await navigator.clipboard.write([item]);
-                    alert("프로젝트 이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");
-                } catch (err) {
-                    console.error("이미지 복사 실패", err);
-                    alert("이미지 복사에 실패했습니다.");
+                console.log("Base64 데이터 추출 완료 (길이:", base64Data.length, ")");
+                
+                // 서버 요청 전송
+                console.log("서버에 추천 요청 전송 중...");
+                const response = await fetch('https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/recommend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image_data: base64Data,
+                        min_price: minPrice,
+                        max_price: maxPrice
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`서버 오류 (${response.status}): ${errorText}`);
                 }
-            });
+                
+                const data = await response.json();
+                console.log("추천 결과 수신:", data);
+                
+                // 결과 표시
+                if (data.recommendations && data.recommendations.length > 0) {
+                    displayRecommendations(data.recommendations);
+                } else {
+                    displayRecommendations([]);
+                }
+                
+            } catch (error) {
+                console.error("추천 과정에서 오류 발생:", error);
+                showError(error.message || "추천 요청에 실패했습니다.");
+            }
+        }
+        
+        // 가격 필터 적용 버튼 이벤트
+        applyPriceFilterButton.addEventListener('click', requestRecommendations);
+        
+        // 프로젝트 저장 버튼 이벤트
+        const saveProjectButton = document.getElementById("saveProjectButton");
+        saveProjectButton.addEventListener("click", function () {
+            // 항상 현재 캔버스 내용을 저장
+            const dataURL = viewerCanvas.toDataURL('image/png');
+            const link = document.createElement("a");
+            link.href = dataURL;
+            link.download = "dream_furniture.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
-    </script>
+        
+        // 프로젝트 공유 버튼 이벤트
+        const shareProjectButton = document.getElementById("shareProjectButton");
+        shareProjectButton.addEventListener("click", async function () {
+            try {
+                const blob = await new Promise(resolve => {
+                    viewerCanvas.toBlob(resolve, 'image/png');
+                });
+                
+                if (!blob) {
+                    throw new Error("이미지 변환 실패");
+                }
+                
+                const item = new ClipboardItem({ "image/png": blob });
+                await navigator.clipboard.write([item]);
+                alert("프로젝트 이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");
+            } catch (err) {
+                console.error("이미지 복사 실패", err);
+                alert("이미지 복사에 실패했습니다: " + err.message);
+            }
+        });
+        
+        // 페이지 로드 시 바로 이미지 처리 및 추천 시작
+        loadAndProcessImage();
+    });
+</script>
 </body>
 </html>
