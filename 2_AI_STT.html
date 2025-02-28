@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>가꿈 - AI 디자인 결과</title>
+  <!-- Tailwind CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <!-- 구글 폰트 -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Space Grotesk', sans-serif; }
+    :root { --gradient-primary: linear-gradient(135deg, #6366F1, #A855F7); }
+    .gradient-text {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .canvas-bg {
+      background: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .canvas-bg::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 1px 1px, #6366F1 1px, transparent 0),
+        radial-gradient(circle at 1px 1px, #A855F7 1px, transparent 0);
+      background-size: 30px 30px, 50px 50px;
+      background-position: 0 0, 15px 15px;
+      opacity: 0.1;
+    }
+    .card-hover { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+    }
+    .gradient-border {
+      position: relative;
+      background: linear-gradient(white, white) padding-box,
+                  var(--gradient-primary) border-box;
+      border: 2px solid transparent;
+    }
+    .style-card { transition: all 0.3s ease; border: 2px solid transparent; }
+    .style-card:hover {
+      border-image: linear-gradient(135deg, #6366F1, #A855F7) 1;
+      transform: translateY(-2px);
+    }
+    .tool-button { transition: all 0.3s ease; }
+    .tool-button:hover {
+      background: var(--gradient-primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Header -->
+  <header class="fixed w-full z-50 glass-effect">
+    <div class="container mx-auto px-6">
+      <nav class="flex items-center justify-between h-20">
+        <a href="index.html" class="text-2xl font-bold gradient-text tracking-tight">가꿈</a>
+        <div class="hidden md:flex">
+          <span class="text-gray-700 text-lg">Where Dreams Are Drawn ⁞ 앨리스 AI Spark Camp ⁞ 1조</span>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pt-32 pb-24">
+    <div class="container mx-auto px-6">
+      <!-- Title Section -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h1 class="text-6xl font-bold mb-6">
+          AI가 생성한
+          <span class="gradient-text">디자인 결과</span>
+        </h1>
+        <p class="text-xl text-gray-600">
+          AI가 스케치를 기반으로 제작한 가구 디자인을 확인하고 수정하세요.
+        </p>
+      </div>
+
+      <!-- Main Workspace -->
+      <div class="grid lg:grid-cols-12 gap-8 mb-16">
+        <!-- Style & Materials Panel -->
+        <div class="lg:col-span-3 space-y-6">
+          <!-- Styles 박스 -->
+          <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+            <h3 class="text-lg font-bold mb-6 gradient-text">Styles</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                <img src="img/Modern.png" alt="모던" class="w-full h-24 object-cover rounded-lg mb-2 gradient-border">
+                <p class="text-sm font-medium">모던</p>
+              </div>
+              <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                <img src="img/Classic.png" alt="클래식" class="w-full h-24 object-cover rounded-lg mb-2 gradient-border">
+                <p class="text-sm font-medium">클래식</p>
+              </div>
+              <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                <img src="img/Minimal.png" alt="미니멀" class="w-full h-24 object-cover rounded-lg mb-2 gradient-border">
+                <p class="text-sm font-medium">미니멀</p>
+              </div>
+              <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                <img src="img/Scandinavian.png" alt="북유럽" class="w-full h-24 object-cover rounded-lg mb-2 gradient-border">
+                <p class="text-sm font-medium">북유럽</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Materials 박스 -->
+          <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+            <h3 class="text-lg font-bold mb-6 gradient-text">Materials</h3>
+            <div class="space-y-4">
+              <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                <div class="flex items-center space-x-3">
+                  <img src="img/Wood.png" alt="원목" class="w-12 h-12 object-cover rounded-lg gradient-border">
+                  <div>
+                    <p class="font-medium">원목</p>
+                    <p class="text-sm text-gray-500">자연스러운 나무 질감</p>
+                  </div>
+                </div>
+              </div>
+              <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                <div class="flex items-center space-x-3">
+                  <img src="img/Metal.png" alt="메탈" class="w-12 h-12 object-cover rounded-lg gradient-border">
+                  <div>
+                    <p class="font-medium">메탈</p>
+                    <p class="text-sm text-gray-500">현대적인 금속 마감</p>
+                  </div>
+                </div>
+              </div>
+              <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                <div class="flex items-center space-x-3">
+                  <img src="img/Fabric.png" alt="페브릭" class="w-12 h-12 object-cover rounded-lg gradient-border">
+                  <div>
+                    <p class="font-medium">페브릭</p>
+                    <p class="text-sm text-gray-500">부드러운 천 소재</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview Area -->
+        <div class="lg:col-span-6">
+          <div class="canvas-bg rounded-3xl p-8 shadow-lg">
+            <div class="gradient-border rounded-2xl bg-white p-4">
+              <div class="flex justify-center items-center">
+                <img id="designPreview" src="" alt="Design Preview" class="rounded-xl w-full max-w-[710px] mx-auto">
+              </div>
+              <!-- 저장하기/공유하기 버튼만 남김 -->
+              <div class="flex justify-end items-center mt-4">
+                <div class="flex space-x-3">
+                  <button id="savePreviewButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                      </path>
+                    </svg>
+                    <span class="text-sm">저장하기</span>
+                  </button>
+                  <button id="sharePreviewButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
+                      </path>
+                    </svg>
+                    <span class="text-sm">공유하기</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Controls Panel -->
+        <div class="lg:col-span-3 space-y-6">
+          <!-- Design Feedback 영역 -->
+          <div class="bg-white rounded-3xl p-6 shadow-lg card-hover min-h-[400px]">
+            <h3 class="text-lg font-bold mb-6 gradient-text">Design Feedback</h3>
+            <!-- 텍스트 입력창 높이를 h-40로 줄임 -->
+            <textarea 
+              id="feedbackText"
+              class="w-full h-40 p-4 rounded-xl border-2 gradient-border focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+              placeholder="수정사항을 자세히 설명해주세요..."></textarea>
+            <button id="feedbackBtn" class="mt-4 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:opacity-90 transition-all">
+              수정 요청하기
+            </button>
+          </div>
+
+          <!-- Speech to Text 영역 (Saved Version 영역 대신) -->
+          <div class="bg-white rounded-3xl p-6 shadow-lg card-hover min-h-[400px]">
+            <h3 class="text-lg font-bold mb-6 gradient-text">Speech to Text</h3>
+            <div class="flex flex-col items-center justify-center space-y-4" id="voiceFeedbackContainer">
+              <button id="startVoiceBtn" class="p-10 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:opacity-90 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3c2.21 0 4 1.79 4 4v4c0 2.21-1.79 4-4 4s-4-1.79-4-4V7c0-2.21 1.79-4 4-4z
+                           M19 10v2c0 3.314-2.686 6-6 6h-2c-3.314 0-6-2.686-6-6v-2
+                           M12 18v4
+                           M9 22h6"/>
+                </svg>
+              </button>
+              <p class="text-sm text-gray-600">클릭하여 음성 입력 시작</p>
+            </div>
+          </div>
+
+          <!-- Recommendation 영역 -->
+          <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+            <h3 class="text-lg font-bold mb-6 gradient-text">Recommendation</h3>
+            <button onclick="goToPage()" class="tool-button w-full gradient-border rounded-xl p-4 text-left hover:bg-gray-50 transition-all group">
+              <script>
+                function goToPage() {
+                  const previewImage = document.getElementById("designPreview");
+                  if (previewImage.src) {
+                    localStorage.setItem("aiDesignImage", previewImage.src);
+                  }
+                  window.location.href = "3_recommend.html";
+                }
+              </script>
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="font-medium mb-1">유사한 가구 추천받기</p>
+                  <p class="text-sm text-gray-500">약 2-3분 소요됩니다</p>
+                </div>
+                <svg class="w-6 h-6 text-indigo-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+    
+  <!-- JavaScript: 저장하기/공유하기 기능 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const savePreviewButton = document.getElementById("savePreviewButton");
+      const sharePreviewButton = document.getElementById("sharePreviewButton");
+      const previewImage = document.getElementById("designPreview");
+
+      savePreviewButton.addEventListener("click", function () {
+        const tempCanvas = document.createElement("canvas");
+        const ctx = tempCanvas.getContext("2d");
+        tempCanvas.width = previewImage.naturalWidth;
+        tempCanvas.height = previewImage.naturalHeight;
+        ctx.drawImage(previewImage, 0, 0);
+        const dataURL = tempCanvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = "design_preview.png";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+
+      sharePreviewButton.addEventListener("click", async function () {
+        const tempCanvas = document.createElement("canvas");
+        const ctx = tempCanvas.getContext("2d");
+        tempCanvas.width = previewImage.naturalWidth;
+        tempCanvas.height = previewImage.naturalHeight;
+        ctx.drawImage(previewImage, 0, 0);
+        tempCanvas.toBlob(async function(blob) {
+          try {
+            const item = new ClipboardItem({ "image/png": blob });
+            await navigator.clipboard.write([item]);
+            alert("이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");
+          } catch (err) {
+            console.error("이미지 복사 실패", err);
+            alert("이미지 복사에 실패했습니다.");
+          }
+        }, "image/png");
+      });
+    });
+  </script>
+    
+  <!-- JavaScript: 미리보기 이미지 로딩 -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      fetch("https://dzbqrrjyhewyahrb.tunnel-pt.elice.io/proxy/8000/inference", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("서버 응답 오류: " + response.statusText);
+        }
+        return response.blob();
+      })
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onloadend = function() {
+          document.getElementById("designPreview").src = reader.result;
+        };
+        reader.readAsDataURL(blob);
+      })
+      .catch(error => {
+        console.error("이미지 전송 실패:", error);
+        alert("이미지 전송에 실패했습니다. 콘솔을 확인하세요.");
+      });
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const previewImage = document.getElementById("designPreview");
+      const storedImage = localStorage.getItem("aiDesignImage");
+      if (storedImage) {
+        previewImage.src = storedImage;
+      }
+    });
+
+    function goToPage() {
+      const previewImage = document.getElementById("designPreview");
+      if (previewImage.src) {
+        localStorage.setItem("aiDesignImage", previewImage.src);
+      }
+      window.location.href = "3_recommend.html";
+    }
+  </script>
+    
+  <!-- JavaScript: STT 음성 인식 (Speech to Text 영역) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const startVoiceBtn = document.getElementById("startVoiceBtn");
+      const feedbackText = document.getElementById("feedbackText");
+      
+      let recognition;
+      if ('webkitSpeechRecognition' in window) {
+        recognition = new webkitSpeechRecognition();
+      } else if ('SpeechRecognition' in window) {
+        recognition = new SpeechRecognition();
+      } else {
+        alert("음성 인식 기능이 이 브라우저에서 지원되지 않습니다.");
+        return;
+      }
+      recognition.lang = 'ko-KR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      
+      startVoiceBtn.addEventListener("click", function() {
+        startVoiceBtn.disabled = true;
+        startVoiceBtn.classList.add("opacity-50");
+        startVoiceBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3c2.21 0 4 1.79 4 4v4c0 2.21-1.79 4-4 4s-4-1.79-4-4V7c0-2.21 1.79-4 4-4z
+                     M19 10v2c0 3.314-2.686 6-6 6h-2c-3.314 0-6-2.686-6-6v-2
+                     M12 18v4
+                     M9 22h6"/>
+          </svg>
+        `;
+        recognition.start();
+      });
+      
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        feedbackText.value += (feedbackText.value ? "\n" : "") + transcript;
+      }
+      
+      recognition.onerror = function(event) {
+        console.error("음성 인식 오류:", event.error);
+        alert("음성 인식 중 오류가 발생했습니다: " + event.error);
+      }
+      
+      recognition.onend = function() {
+        startVoiceBtn.disabled = false;
+        startVoiceBtn.classList.remove("opacity-50");
+        startVoiceBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3c2.21 0 4 1.79 4 4v4c0 2.21-1.79 4-4 4s-4-1.79-4-4V7c0-2.21 1.79-4 4-4z
+                     M19 10v2c0 3.314-2.686 6-6 6h-2c-3.314 0-6-2.686-6-6v-2
+                     M12 18v4
+                     M9 22h6"/>
+          </svg>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>
