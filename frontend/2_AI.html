@@ -513,7 +513,8 @@
                 resultBox.classList.remove("hidden");
                 resultBox.textContent = "맞춤법 검사 중...";
                 
-                fetch("https://99ed-219-240-96-223.ngrok-free.app/check", {
+                // URL 변경
+                fetch("https://2a64-219-240-96-223.ngrok-free.app/check", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ text: text })
@@ -571,7 +572,8 @@
         
                 window.showLoading();
         
-                const response = await fetch("http://localhost:8000/edit-image", {
+                // URL 변경
+                const response = await fetch("https://2a64-219-240-96-223.ngrok-free.app/edit-image", {
                     method: "POST",
                     body: formData
                 });

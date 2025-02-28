@@ -5,6 +5,8 @@ from fastapi.responses import JSONResponse
 import uvicorn
 import io
 import base64
+import re
+import numpy as np
 from PIL import Image, ImageDraw
 import torch
 from torchvision import transforms
@@ -13,7 +15,29 @@ from data.base_dataset import get_params, get_transform
 from dotenv import load_dotenv
 from openai import OpenAI
 import os
-import requests  # 맞춤법 검사 API 요청을 위한 추가
+import requests
+from pymongo import MongoClient
+from gridfs import GridFS
+from transformers import CLIPProcessor, CLIPModel
+from pydantic import BaseModel
+from io import BytesIO
+
+# ---------------------------
+# MongoDB 연결 설정
+# ---------------------------
+try:
+    MONGO_URI = "mongodb+srv://sth0824:daniel0824@sthcluster.sisvx.mongodb.net/?retryWrites=true&w=majority&appName=STHCluster"
+    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    # 연결 테스트
+    client.server_info()
+    print("MongoDB 연결 성공!")
+except Exception as e:
+    print(f"MongoDB 연결 실패: {str(e)}")
+    print("주의: MongoDB가 없으면 추천 기능이 작동하지 않습니다!")
+
+db = client["furniture_db"]
+collection = db["furniture_embeddings"]
+fs = GridFS(db)
 
 # ---------------------------
 # opt 객체 생성 (TestOptions 기반)
@@ -43,6 +67,12 @@ model_path = os.path.join("checkpoints", "furniture_pix2pix", "latest_net_G.pth"
 model.load_state_dict(torch.load(model_path, map_location=device))
 
 # ---------------------------
+# CLIP 모델 로드 (가구 추천용)
+# ---------------------------
+clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+
+# ---------------------------
 # FastAPI 앱 및 CORS 설정
 # ---------------------------
 app = FastAPI()
@@ -67,6 +97,66 @@ def tensor_to_image(tensor: torch.Tensor) -> Image.Image:
     to_pil = transforms.ToPILImage()
     image = to_pil(tensor.clamp(0, 1))
     return image
+
+# ---------------------------
+# CLIP 임베딩 추출 함수
+# ---------------------------
+def extract_embedding(image: Image) -> dict:
+    inputs = clip_processor(images=image, return_tensors="pt")
+    with torch.no_grad():
+        clip_embedding = clip_model.get_image_features(**inputs).cpu().numpy().flatten()
+    return {"clip_embedding": clip_embedding, "cnn_embedding": clip_embedding, "vit_embedding": clip_embedding}
+
+# ---------------------------
+# 코사인 유사도 계산 함수
+# ---------------------------
+def cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
+    return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+
+# ---------------------------
+# 가격 문자열에서 숫자만 추출하는 함수
+# ---------------------------
+def extract_numeric_price(price_str):
+    if not isinstance(price_str, str):
+        return 0  # 문자열이 아니면 변환할 수 없음
+
+    price_str = price_str.replace("₩", "").replace(",", "").replace("(won)", "").replace("원", "").strip()
+    numeric_part = re.findall(r'\d+', price_str)
+    
+    if numeric_part:
+        numeric_value = int("".join(numeric_part))
+    else:
+        numeric_value = 0  # 변환 실패 시 0원 처리
+    
+    return numeric_value
+
+# ---------------------------
+# 유사 가구 검색 함수
+# ---------------------------
+def find_similar_furniture(query_embedding: dict, min_price: int = 0, max_price: int = 100000000, top_k: int = 4):
+    all_furniture = list(collection.find({}, {
+        "cnn_embedding": 1, "vit_embedding": 1, "clip_embedding": 1, 
+        "filename": 1, "category": 1, "price": 1, "brand": 1, "coupang_link": 1, "_id": 0
+    }))
+
+    similarities = []
+    for furniture in all_furniture:
+        price = extract_numeric_price(furniture.get("price", "0"))
+        
+        if min_price <= price <= max_price:
+            stored_cnn = np.array(furniture.get("cnn_embedding", []))
+            stored_vit = np.array(furniture.get("vit_embedding", []))
+            stored_clip = np.array(furniture.get("clip_embedding", []))
+
+            cnn_similarity = cosine_similarity(query_embedding["cnn_embedding"], stored_cnn) if len(stored_cnn) > 0 else 0
+            vit_similarity = cosine_similarity(query_embedding["vit_embedding"], stored_vit) if len(stored_vit) > 0 else 0
+            clip_similarity = cosine_similarity(query_embedding["clip_embedding"], stored_clip) if len(stored_clip) > 0 else 0
+
+            avg_similarity = (cnn_similarity + vit_similarity + clip_similarity) / 3
+            similarities.append((avg_similarity, furniture))
+
+    top_matches = sorted(similarities, key=lambda x: x[0], reverse=True)[:top_k]
+    return [match[1] for match in top_matches]
 
 # ---------------------------
 # API 엔드포인트
@@ -148,7 +238,7 @@ async def check_spelling(text_data: dict):
         )
 
 # ---------------------------
-# OpenAI API 클라이언트 설정
+# OpenAI API 클라이언트 설정 및 이미지 편집 엔드포인트
 # ---------------------------
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
@@ -288,6 +378,70 @@ async def edit_image(
     except Exception as e:
         print(f"DALL-E API 오류: {str(e)}")
         return JSONResponse(status_code=400, content={"error": f"DALL-E API 오류: {str(e)}"})
+
+# ---------------------------
+# 가구 추천 관련 클래스 및 엔드포인트
+# ---------------------------
+class RecommendRequest(BaseModel):
+    image_data: str
+    min_price: int = 0
+    max_price: int = 100000000
+
+@app.post("/recommend")
+async def recommend_furniture_endpoint(request: RecommendRequest):
+    """
+    사용자가 업로드한 이미지와 유사한 가구를 추천합니다.
+    가격 범위 필터링도 지원합니다.
+    """
+    try:
+        min_price = request.min_price
+        max_price = request.max_price
+        print(f"적용된 가격 필터 값 - 최소 가격: {min_price}, 최대 가격: {max_price}")
+        
+        # 디버깅 정보 추가
+        print(f"수신된 이미지 데이터 길이: {len(request.image_data[:50])}...")
+        
+        try:
+            # Base64 이미지 디코딩
+            image_bytes = base64.b64decode(request.image_data)
+            # 이미지 열기
+            image = Image.open(BytesIO(image_bytes)).convert("RGB")
+            print(f"이미지 열기 성공: 크기={image.size}, 모드={image.mode}")
+        except Exception as e:
+            print(f"이미지 처리 오류: {str(e)}")
+            return JSONResponse(
+                status_code=400,
+                content={"error": f"이미지 처리 오류: {str(e)}"}
+            )
+        
+        # 이미지 임베딩 추출
+        query_embedding = extract_embedding(image)
+        
+        # 유사 가구 검색
+        recommended_furniture = find_similar_furniture(query_embedding, min_price, max_price)
+        print(f"최종 추천된 가구 개수: {len(recommended_furniture)}개")
+        
+        return {"recommendations": recommended_furniture}
+    except Exception as e:
+        print(f"추천 과정에서 오류 발생: {str(e)}")
+        return JSONResponse(
+            status_code=500, 
+            content={"error": f"가구 추천 중 오류 발생: {str(e)}"}
+        )
+
+@app.get("/image/{filename}")
+async def get_image(filename: str):
+    """
+    MongoDB에 저장된 가구 이미지를 다운로드하는 API
+    """
+    try:
+        image_data = fs.find_one({"filename": filename})
+        if not image_data:
+            raise HTTPException(status_code=404, detail="이미지를 찾을 수 없습니다!")
+        return StreamingResponse(io.BytesIO(image_data.read()), media_type="image/jpeg")
+    except Exception as e:
+        print(f"이미지 제공 중 오류 발생: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"이미지 제공 중 오류 발생: {str(e)}")
 
 # ---------------------------
 # 서버 실행
