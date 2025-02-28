@@ -61,6 +61,21 @@
       color: white;
       transform: translateY(-2px);
     }
+    /* Tailwind CSS 클래스가 없는 경우를 위한 기본 스타일 */
+    .p-10 { padding: 2.5rem; }
+    .rounded-full { border-radius: 9999px; }
+    .bg-gradient-to-r { background: linear-gradient(to right, #6366F1, #A855F7); }
+    .text-white { color: white; }
+    .hover\:opacity-90:hover { opacity: 0.9; }
+    .transition-all { transition: all 0.3s ease; }
+    .opacity-50 { opacity: 0.5; }
+    .h-16 { height: 4rem; }
+    .w-16 { width: 4rem; }
+    .animate-pulse { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -199,7 +214,7 @@
             </button>
           </div>
 
-          <!-- Speech to Text 영역 (Saved Version 영역 대신) -->
+          <!-- Speech to Text 영역 -->
           <div class="bg-white rounded-3xl p-6 shadow-lg card-hover min-h-[400px]">
             <h3 class="text-lg font-bold mb-6 gradient-text">Speech to Text</h3>
             <div class="flex flex-col items-center justify-center space-y-4" id="voiceFeedbackContainer">
@@ -211,7 +226,8 @@
                            M9 22h6"/>
                 </svg>
               </button>
-              <p class="text-sm text-gray-600">클릭하여 음성 입력 시작</p>
+              <!-- 안내 문구에 id 추가 -->
+              <p id="voiceFeedbackText" class="text-sm text-gray-600">클릭하여 음성 입력 시작</p>
             </div>
           </div>
 
@@ -335,6 +351,7 @@
     document.addEventListener("DOMContentLoaded", function() {
       const startVoiceBtn = document.getElementById("startVoiceBtn");
       const feedbackText = document.getElementById("feedbackText");
+      const voiceFeedbackText = document.getElementById("voiceFeedbackText");
       
       let recognition;
       if ('webkitSpeechRecognition' in window) {
@@ -352,6 +369,9 @@
       startVoiceBtn.addEventListener("click", function() {
         startVoiceBtn.disabled = true;
         startVoiceBtn.classList.add("opacity-50");
+        // 녹음 시작 시 안내 문구 변경
+        voiceFeedbackText.innerText = "5초간 녹음됩니다";
+        // 녹음 중일 때 애니메이션 아이콘으로 변경
         startVoiceBtn.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 3c2.21 0 4 1.79 4 4v4c0 2.21-1.79 4-4 4s-4-1.79-4-4V7c0-2.21 1.79-4 4-4z
@@ -366,16 +386,17 @@
       recognition.onresult = function(event) {
         const transcript = event.results[0][0].transcript;
         feedbackText.value += (feedbackText.value ? "\n" : "") + transcript;
-      }
+      };
       
       recognition.onerror = function(event) {
         console.error("음성 인식 오류:", event.error);
         alert("음성 인식 중 오류가 발생했습니다: " + event.error);
-      }
+      };
       
       recognition.onend = function() {
         startVoiceBtn.disabled = false;
         startVoiceBtn.classList.remove("opacity-50");
+        // 원래 아이콘으로 복원
         startVoiceBtn.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 3c2.21 0 4 1.79 4 4v4c0 2.21-1.79 4-4 4s-4-1.79-4-4V7c0-2.21 1.79-4 4-4z
@@ -384,7 +405,9 @@
                      M9 22h6"/>
           </svg>
         `;
-      }
+        // 전사 결과가 있으면 안내 문구를 원래대로 복원
+        voiceFeedbackText.innerText = "클릭하여 음성 입력 시작";
+      };
     });
   </script>
 </body>
