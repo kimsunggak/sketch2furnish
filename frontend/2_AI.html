@@ -290,156 +290,7 @@
         </div>
     </main>
 
-    <!-- 스타일/재질 선택 및 버전 관리 -->
-    <script>        
-        document.addEventListener('DOMContentLoaded', function() {
-            // 현재 날짜 설정
-            const now = new Date();
-            const formattedDate = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
-            document.getElementById('currentDate').textContent = formattedDate;
-
-            // 스타일/재질 선택 처리
-            const styleCards = document.querySelectorAll('.style-card');
-            styleCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    const style = this.getAttribute('data-style');
-                    const material = this.getAttribute('data-material');
-                    let prompt = '';
-
-                    // 같은 카테고리의 다른 카드에서 active 클래스 제거
-                    const siblings = this.parentElement.querySelectorAll('.style-card');
-                    siblings.forEach(sibling => sibling.classList.remove('active'));
-
-                    // 현재 카드에 active 클래스 추가
-                    this.classList.add('active');
-
-                    // 스타일 또는 재질에 따라 프롬프트 텍스트 필드에 텍스트 추가
-                    const promptText = document.getElementById('feedbackPrompt');
-                    if (style) {
-                        prompt = `${style} 스타일로 변경해주세요`;
-                    } else if (material) {
-                        prompt = `${material} 재질로 변경해주세요`;
-                    }
-
-                    // 기존 텍스트가 있으면 줄바꿈 후 추가
-                    if (promptText.value.trim() !== '') {
-                        promptText.value += '\n' + prompt;
-                    } else {
-                        promptText.value = prompt;
-                    }
-                });
-            });
-
-            // 초기 이미지 로드
-            const previewImage = document.getElementById("designPreview");
-            const storedImage = localStorage.getItem("aiDesignImage");
-            if (storedImage) {
-                previewImage.src = storedImage;
-            }
-
-            // 페이지 이동 함수
-            window.goToPage = function() {
-                localStorage.setItem("aiDesignImage", previewImage.src);
-                window.location.href = "3_recommend.html";
-            }
-        });
-    </script>
-
-    <!-- 맞춤법 검사 스크립트 -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const feedbackTextEl = document.getElementById("feedbackPrompt");
-            const resultBox = document.getElementById("spellResult");
-            const spellCheckBtn = document.getElementById("spellCheckBtn");
-            
-            spellCheckBtn.addEventListener("click", function() {
-                const text = feedbackTextEl.value;
-                if (!text.trim()) {
-                    alert("검사할 텍스트를 입력해주세요.");
-                    return;
-                }
-
-                // 결과 영역 표시 및 로딩 상태 표시
-                resultBox.classList.remove("hidden");
-                resultBox.textContent = "맞춤법 검사 중...";
-
-                fetch("https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/check", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: text })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        resultBox.innerHTML = `<span class="text-red-500">오류 발생: ${data.error}</span>`;
-                    } else {
-                        if (data.checked_text === text) {
-                            resultBox.innerHTML = `<span class="text-green-500">맞춤법 오류가 없습니다.</span>`;
-                        } else {
-                            resultBox.innerHTML = `
-                                <div class="mb-2 text-green-600 font-medium">맞춤법 교정 결과:</div>
-                                <div class="text-gray-700">${data.checked_text}</div>
-                            `;
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error("맞춤법 검사 실패:", error);
-                    resultBox.innerHTML = `<span class="text-red-500">맞춤법 검사에 실패했습니다.</span>`;
-                });
-            });
-        });
-    </script>
-
-    <!-- 피드백 제출 및 이미지 수정 요청 -->
-    <script>
-        document.getElementById("feedbackSubmit").addEventListener("click", async function() {
-            const prompt = document.getElementById("feedbackPrompt").value;
-            if (!prompt) {
-                alert("수정할 내용을 입력해주세요.");
-                return;
-            }
-            const imageUrl = document.getElementById("designPreview").src;
-            if (!imageUrl) {
-                alert("수정할 이미지가 없습니다.");
-                return;
-            }
-            try {
-                const imageResponse = await fetch(imageUrl);
-                if (!imageResponse.ok) {
-                    throw new Error("이미지 불러오기 실패");
-                }
-                const blob = await imageResponse.blob();
-                const file = new File([blob], "original.png", { type: "image/png" });
-                const formData = new FormData();
-                formData.append("original_image", file);
-                formData.append("prompt", prompt);
-                window.showLoading();
-                const response = await fetch("https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/edit-image", {
-                    method: "POST",
-                    body: formData
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || "수정 요청 실패");
-                }
-                const data = await response.json();
-                if (data.result_url) {
-                    document.getElementById("designPreview").src = data.result_url;
-                    window.saveNewVersion(prompt, data.result_url);
-                } else {
-                    alert("결과 이미지가 없습니다.");
-                }
-            } catch (error) {
-                console.error("수정 요청 실패:", error);
-                alert("수정 요청에 실패했습니다: " + error.message);
-            } finally {
-                window.hideLoading();
-            }
-        });
-    </script>
-
-    <!-- 스타일/재질 선택 스크립트 정리 -->
+    <!-- 중복된 스크립트 정리 -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // 현재 날짜 설정
@@ -560,6 +411,100 @@
             }
             window.location.href = "3_recommend.html";
         }
+    </script>
+
+    <!-- 맞춤법 검사 스크립트 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const feedbackTextEl = document.getElementById("feedbackPrompt");
+            const resultBox = document.getElementById("spellResult");
+            const spellCheckBtn = document.getElementById("spellCheckBtn");
+            
+            spellCheckBtn.addEventListener("click", function() {
+                const text = feedbackTextEl.value;
+                if (!text.trim()) {
+                    alert("검사할 텍스트를 입력해주세요.");
+                    return;
+                }
+
+                // 결과 영역 표시 및 로딩 상태 표시
+                resultBox.classList.remove("hidden");
+                resultBox.textContent = "맞춤법 검사 중...";
+
+                fetch("https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/check", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: text })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        resultBox.innerHTML = `<span class="text-red-500">오류 발생: ${data.error}</span>`;
+                    } else {
+                        if (data.checked_text === text) {
+                            resultBox.innerHTML = `<span class="text-green-500">맞춤법 오류가 없습니다.</span>`;
+                        } else {
+                            resultBox.innerHTML = `
+                                <div class="mb-2 text-green-600 font-medium">맞춤법 교정 결과:</div>
+                                <div class="text-gray-700">${data.checked_text}</div>
+                            `;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("맞춤법 검사 실패:", error);
+                    resultBox.innerHTML = `<span class="text-red-500">맞춤법 검사에 실패했습니다.</span>`;
+                });
+            });
+        });
+    </script>
+
+    <!-- 피드백 제출 및 이미지 수정 요청 -->
+    <script>
+        document.getElementById("feedbackSubmit").addEventListener("click", async function() {
+            const prompt = document.getElementById("feedbackPrompt").value;
+            if (!prompt) {
+                alert("수정할 내용을 입력해주세요.");
+                return;
+            }
+            const imageUrl = document.getElementById("designPreview").src;
+            if (!imageUrl) {
+                alert("수정할 이미지가 없습니다.");
+                return;
+            }
+            try {
+                const imageResponse = await fetch(imageUrl);
+                if (!imageResponse.ok) {
+                    throw new Error("이미지 불러오기 실패");
+                }
+                const blob = await imageResponse.blob();
+                const file = new File([blob], "original.png", { type: "image/png" });
+                const formData = new FormData();
+                formData.append("original_image", file);
+                formData.append("prompt", prompt);
+                window.showLoading();
+                const response = await fetch("https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/edit-image", {
+                    method: "POST",
+                    body: formData
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "수정 요청 실패");
+                }
+                const data = await response.json();
+                if (data.result_url) {
+                    document.getElementById("designPreview").src = data.result_url;
+                    window.saveNewVersion(prompt, data.result_url);
+                } else {
+                    alert("결과 이미지가 없습니다.");
+                }
+            } catch (error) {
+                console.error("수정 요청 실패:", error);
+                alert("수정 요청에 실패했습니다: " + error.message);
+            } finally {
+                window.hideLoading();
+            }
+        });
     </script>
 </body>
 </html>

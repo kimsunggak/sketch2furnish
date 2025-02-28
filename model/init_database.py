@@ -11,20 +11,15 @@ try:
     # MongoDB 연결 (오류 처리 추가)
     try:
         print("MongoDB에 연결 중...")
-        # 먼저 로컬 연결 시도
-        MONGO_URI = "mongodb://localhost:27017/"
+        # 동일한 연결 문자열 사용
+        MONGO_URI = "mongodb+srv://sth0824:daniel0824@sthcluster.sisvx.mongodb.net/?retryWrites=true&w=majority&appName=STHCluster"
         client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
         # 연결 테스트
         client.server_info()
-        print("✅ 로컬 MongoDB 연결 성공!")
+        print("MongoDB 연결 성공!")
     except Exception as e:
-        print(f"⚠️ 로컬 MongoDB 연결 실패, 클라우드 MongoDB 시도 중... 오류: {str(e)}")
-        # 클라우드 연결 시도
-        MONGO_URI = "mongodb+srv://sth0824:daniel0824@sthcluster.sisvx.mongodb.net/?retryWrites=true&w=majority&appName=STHCluster"
-        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=10000)
-        # 연결 테스트
-        client.server_info()
-        print("✅ 클라우드 MongoDB 연결 성공!")
+        print(f"MongoDB 연결 실패: {str(e)}")
+        print("주의: MongoDB가 없으면 추천 기능이 작동하지 않습니다!")
 
     db = client["furniture_db"]
     fs = gridfs.GridFS(db)
@@ -119,7 +114,7 @@ try:
     # 임베딩 파일이 있으면 로드
     if os.path.exists(embedding_dir) and len(os.listdir(embedding_dir)) > 0:
         for emb_file in os.listdir(embedding_dir):
-            if emb_file.endswith(".json"):
+            if (emb_file.endswith(".json")):
                 file_path = os.path.join(embedding_dir, emb_file)
                 try:
                     with open(file_path, "r") as f:

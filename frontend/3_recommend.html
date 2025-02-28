@@ -193,7 +193,7 @@
                     // 이미지 경로 오류 처리 추가
                     let imgSrc = '';
                     try {
-                        // URL 변경
+                        // URL 변경: 서버 주소 통일
                         imgSrc = `https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/image/${encodeURIComponent(product.filename)}`;
                     } catch (e) {
                         console.error("이미지 경로 생성 오류:", e);
