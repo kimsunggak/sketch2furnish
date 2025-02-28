@@ -194,7 +194,7 @@
                     let imgSrc = '';
                     try {
                         // URL 변경
-                        imgSrc = `https://2a64-219-240-96-223.ngrok-free.app/image/${encodeURIComponent(product.filename)}`;
+                        imgSrc = `https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/image/${encodeURIComponent(product.filename)}`;
                     } catch (e) {
                         console.error("이미지 경로 생성 오류:", e);
                         imgSrc = "img/product_placeholder.png"; // 기본 이미지
@@ -291,7 +291,7 @@
                     console.log("처리된 Base64 데이터:", imageData.substring(0, 50) + "...");
                     
                     // 서버에 요청 보내기
-                    fetch('https://2a64-219-240-96-223.ngrok-free.app/recommend', {
+                    fetch('https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/recommend', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

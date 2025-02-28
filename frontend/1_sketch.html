@@ -470,8 +470,8 @@
         formData.append("file", blob, "sketch.png");
 
         try {
-            // URL 변경: 새 ngrok URL로 업데이트
-            const response = await fetch("https://2a64-219-240-96-223.ngrok-free.app/inference", {
+            // URL 변경: 새 서버 주소로 업데이트
+            const response = await fetch("https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/inference", {
                 method: "POST",
                 body: formData
             });
