@@ -59,8 +59,9 @@
         .style-card {
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            cursor: pointer;
         }
-        .style-card:hover {
+        .style-card:hover, .style-card.active {
             border-image: linear-gradient(135deg, #6366F1, #A855F7) 1;
             transform: translateY(-2px);
         }
@@ -72,6 +73,39 @@
             color: white;
             transform: translateY(-2px);
         }
+        /* 로딩 애니메이션 */
+        .loading {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .loading div {
+            position: absolute;
+            border: 4px solid #6366F1;
+            opacity: 1;
+            border-radius: 50%;
+            animation: loading 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+        }
+        .loading div:nth-child(2) {
+            animation-delay: -0.5s;
+        }
+        @keyframes loading {
+            0% {
+                top: 36px;
+                left: 36px;
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                top: 0px;
+                left: 0px;
+                width: 72px;
+                height: 72px;
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -79,7 +113,6 @@
     <header class="fixed w-full z-50 glass-effect">
         <div class="container mx-auto px-6">
             <nav class="flex items-center justify-between h-20">
-                <!-- 수정: href="#"를 href="index.html"로 변경하여 index 페이지로 이동 -->
                 <a href="index.html" class="text-2xl font-bold gradient-text tracking-tight">가꿈</a>
                 <div class="hidden md:flex">
                     <span class="text-gray-700 text-lg">Where Dreams Are Drawn ⁞ 앨리스 AI Spark Camp ⁞ 1조</span>
@@ -110,19 +143,19 @@
                     <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                         <h3 class="text-lg font-bold mb-6 gradient-text">Styles</h3>
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                            <div class="style-card p-4 rounded-xl bg-gray-50" data-style="모던">
                                 <img src="img/Modern.png" alt="모던" class="w-full h-24 object-cover rounded-lg mb-2 gradient-border">
                                 <p class="text-sm font-medium">모던</p>
                             </div>
-                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                            <div class="style-card p-4 rounded-xl bg-gray-50" data-style="클래식">
                                 <img src="img/Classic.png" alt="클래식" class="w-full h-24 object-cover rounded-lg mb-2 gradient-border">
                                 <p class="text-sm font-medium">클래식</p>
                             </div>
-                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                            <div class="style-card p-4 rounded-xl bg-gray-50" data-style="미니멀">
                                 <img src="img/Minimal.png" alt="미니멀" class="w-full h-24 object-cover rounded-lg mb-2 gradient-border">
                                 <p class="text-sm font-medium">미니멀</p>
                             </div>
-                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                            <div class="style-card p-4 rounded-xl bg-gray-50" data-style="북유럽">
                                 <img src="img/Scandinavian.png" alt="북유럽" class="w-full h-24 object-cover rounded-lg mb-2 gradient-border">
                                 <p class="text-sm font-medium">북유럽</p>
                             </div>
@@ -133,7 +166,7 @@
                     <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                         <h3 class="text-lg font-bold mb-6 gradient-text">Materials</h3>
                         <div class="space-y-4">
-                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                            <div class="style-card p-4 rounded-xl bg-gray-50" data-material="원목">
                                 <div class="flex items-center space-x-3">
                                     <img src="img/Wood.png" alt="원목" class="w-12 h-12 object-cover rounded-lg gradient-border">
                                     <div>
@@ -142,7 +175,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                            <div class="style-card p-4 rounded-xl bg-gray-50" data-material="메탈">
                                 <div class="flex items-center space-x-3">
                                     <img src="img/Metal.png" alt="메탈" class="w-12 h-12 object-cover rounded-lg gradient-border">
                                     <div>
@@ -151,7 +184,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="style-card p-4 rounded-xl bg-gray-50 cursor-pointer">
+                            <div class="style-card p-4 rounded-xl bg-gray-50" data-material="페브릭">
                                 <div class="flex items-center space-x-3">
                                     <img src="img/Fabric.png" alt="페브릭" class="w-12 h-12 object-cover rounded-lg gradient-border">
                                     <div>
@@ -167,103 +200,88 @@
                 <!-- Preview Area -->
                 <div class="lg:col-span-6">
                     <div class="canvas-bg rounded-3xl p-8 shadow-lg">
-                    <div class="gradient-border rounded-2xl bg-white p-4">
-                        <!-- 이미지 중앙 정렬을 위한 래퍼 -->
-                        <div class="flex justify-center items-center">
-                        <!-- 기본 src를 빈 문자열로 변경 -->
-                        <img id="designPreview" src="" alt="Design Preview" class="rounded-xl w-full max-w-[710px] mx-auto">
+                        <div class="gradient-border rounded-2xl bg-white p-4">
+                            <!-- 이미지와 로딩 표시기를 포함하는 컨테이너 -->
+                            <div class="flex justify-center items-center relative" style="min-height: 256px;">
+                                <!-- 로딩 애니메이션 -->
+                                <div id="loadingIndicator" class="loading absolute" style="display: none;">
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <!-- 이미지 -->
+                                <img id="designPreview" src="" alt="Design Preview" class="rounded-xl w-full max-w-[710px] mx-auto">
+                            </div>
+                            <div class="flex justify-between items-center mt-4">
+                                <div>
+                                    <!-- 버전 / 수정일 표시 -->
+                                    <h3 id="previewVersion" class="font-semibold text-lg">현재 버전: v1.0</h3>
+                                    <p id="previewDate" class="text-gray-500 text-sm">최종 수정: <span id="currentDate"></span></p>
+                                </div>
+                                <!-- 저장하기 & 공유하기 버튼 -->
+                                <div class="flex space-x-3">
+                                    <button id="savePreviewButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1">
+                                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                                        </svg>
+                                        <span class="text-sm">저장하기</span>
+                                    </button>
+                                    <button id="sharePreviewButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1">
+                                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                        </svg>
+                                        <span class="text-sm">공유하기</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center mt-4">
-                        <div>
-                            <!-- 버전 / 수정일 표시 -->
-                            <h3 id="previewVersion" class="font-semibold text-lg">현재 버전: v1.2</h3>
-                            <p id="previewDate" class="text-gray-500 text-sm">최종 수정: 2024.01.05</p>
-                        </div>
-                        <!-- 저장하기 & 공유하기 버튼 -->
-                        <div class="flex space-x-3">
-                            <button id="savePreviewButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1">
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
-                                </path>
-                            </svg>
-                            <span class="text-sm">저장하기</span>
-                            </button>
-                            <button id="sharePreviewButton" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1">
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
-                                </path>
-                            </svg>
-                            <span class="text-sm">공유하기</span>
-                            </button>
-                        </div>
-                        </div>
-                    </div>
                     </div>
                 </div>
-  
 
                 <!-- Controls Panel -->
                 <div class="lg:col-span-3 space-y-6">
                     <!-- Design Feedback 영역 -->
                     <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                         <h3 class="text-lg font-bold mb-6 gradient-text">Design Feedback</h3>
-                        <textarea 
-                            class="w-full h-32 p-4 rounded-xl border-2 gradient-border focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
-                            placeholder="수정사항을 자세히 설명해주세요..."></textarea>
-                        <button class="mt-4 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:opacity-90 transition-all">
-                            수정 요청하기
-                        </button>
-                    </div>
-
-                    <!-- Saved Version 영역 (클릭 시 해당 버전 정보로 업데이트) -->
-                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
-                        <h3 class="text-lg font-bold mb-6 gradient-text">Saved Version</h3>
-                        <div class="space-y-4" id="savedVersionList">
-                            <!-- v1.2 -->
-                            <div 
-                              class="p-4 rounded-xl border-2 border-gray-100 hover:border-indigo-500 transition-all cursor-pointer saved-version"
-                              data-img="img/AI Furniture Design.png"
-                              data-version="v1.2"
-                              data-date="2024.01.05"
-                            >
-                                <div class="flex justify-between items-center mb-2">
-                                    <p class="font-medium">버전 1.2</p>
-                                    <p class="text-sm text-gray-500">2024.01.05</p>
-                                </div>
-                                <p class="text-sm text-gray-600">초기 디자인 수정</p>
+                        <div class="flex flex-col gap-4">
+                            <!-- 입력 영역 -->
+                            <textarea 
+                                id="feedbackPrompt"
+                                class="w-full h-32 p-4 rounded-xl border-2 gradient-border focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                                placeholder="가구 스타일/재질 변경에 대해 설명해주세요..."></textarea>
+                            
+                            <!-- 맞춤법 검사 결과 영역 -->
+                            <div id="spellResult" class="w-full p-4 rounded-xl border-2 gradient-border bg-gray-50 text-sm max-h-32 overflow-auto hidden">
+                                맞춤법 검사 결과가 표시됩니다.
                             </div>
-                            <!-- v1.1 -->
-                            <div 
-                              class="p-4 rounded-xl border-2 border-gray-100 hover:border-indigo-500 transition-all cursor-pointer saved-version"
-                              data-img="img/Furniture Design.jpeg"
-                              data-version="v1.1"
-                              data-date="2024.01.04"
-                            >
-                                <div class="flex justify-between items-center mb-2">
-                                    <p class="font-medium">버전 1.1</p>
-                                    <p class="text-sm text-gray-500">2024.01.04</p>
-                                </div>
-                                <p class="text-sm text-gray-600">재질 변경 및 크기 조정</p>
+                            
+                            <div class="flex space-x-2">
+                                <!-- 맞춤법 검사 버튼 -->
+                                <button id="spellCheckBtn" class="flex-grow bg-indigo-100 text-indigo-600 py-2 rounded-xl hover:bg-indigo-200 transition-all">
+                                    맞춤법 검사
+                                </button>
+                                
+                                <!-- 수정 요청 버튼 -->
+                                <button id="feedbackSubmit" class="flex-grow bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 rounded-xl hover:opacity-90 transition-all">
+                                    수정 요청하기
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Recommendation 영역 -->
+                    <!-- Saved Version 영역 -->
+                    <div id="versionsContainer" class="bg-white rounded-3xl p-6 shadow-lg card-hover">
+                        <h3 class="text-lg font-bold mb-6 gradient-text">Saved Version</h3>
+                        <div class="space-y-4" id="savedVersionList">
+                            <!-- 버전 리스트는 동적으로 생성됩니다 -->
+                        </div>
+                    </div>
+
+                    <!-- Recommendation 영역 다시 추가 -->
                     <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                         <h3 class="text-lg font-bold mb-6 gradient-text">Recommendation</h3>
-                        <button onclick="goToPage()"  class="tool-button w-full gradient-border rounded-xl p-4 text-left hover:bg-gray-50 transition-all group">
-                            <script>
-                                function goToPage() {
-                                    // 현재 이미지를 localStorage에 저장
-                                    const previewImage = document.getElementById("designPreview");
-                                    if (previewImage.src) {
-                                        localStorage.setItem("aiDesignImage", previewImage.src);
-                                    }
-                                    window.location.href = "3_recommend.html";
-                                }
-                            </script>
+                        <button onclick="goToPage()" class="tool-button w-full gradient-border rounded-xl p-4 text-left hover:bg-gray-50 transition-all group">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <p class="font-medium mb-1">유사한 가구 추천받기</p>
@@ -280,115 +298,303 @@
         </div>
     </main>
     
-    <!-- JavaScript: Saved Version 카드 클릭 시 미리보기 이미지 및 텍스트 업데이트 -->
+    <!-- 스타일/재질 선택 및 버전 관리 -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const savedVersions = document.querySelectorAll('.saved-version');
-            const previewImage = document.getElementById('designPreview');
-            const previewVersion = document.getElementById('previewVersion');
-            const previewDate = document.getElementById('previewDate');
-
-            savedVersions.forEach(item => {
-                item.addEventListener('click', function() {
-                    const newSrc = this.getAttribute('data-img');
-                    const newVersion = this.getAttribute('data-version');
-                    const newDate = this.getAttribute('data-date');
-                    previewImage.src = newSrc;
-                    previewVersion.textContent = '현재 버전: ' + newVersion;
-                    previewDate.textContent = '최종 수정: ' + newDate;
+            // 현재 날짜 설정
+            const now = new Date();
+            const formattedDate = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+            document.getElementById('currentDate').textContent = formattedDate;
+            
+            // 스타일/재질 선택 처리
+            const styleCards = document.querySelectorAll('.style-card');
+            
+            styleCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const style = this.getAttribute('data-style');
+                    const material = this.getAttribute('data-material');
+                    let prompt = '';
+                    
+                    // 같은 카테고리의 다른 카드에서 active 클래스 제거
+                    const siblings = this.parentElement.querySelectorAll('.style-card');
+                    siblings.forEach(sibling => sibling.classList.remove('active'));
+                    
+                    // 현재 카드에 active 클래스 추가
+                    this.classList.add('active');
+                    
+                    // 스타일 또는 재질에 따라 프롬프트 텍스트 필드에 텍스트 추가
+                    const promptText = document.getElementById('feedbackPrompt');
+                    if (style) {
+                        prompt = `${style} 스타일로 변경해주세요`;
+                    } else if (material) {
+                        prompt = `${material} 재질로 변경해주세요`;
+                    }
+                    
+                    // 기존 텍스트가 있으면 줄바꿈 후 추가
+                    if (promptText.value.trim() !== '') {
+                        promptText.value += '\n' + prompt;
+                    } else {
+                        promptText.value = prompt;
+                    }
                 });
             });
-        });
-    </script>
-    
-    <!-- JavaScript: 미리보기 영역의 저장하기, 공유하기 기능 -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const savePreviewButton = document.getElementById("savePreviewButton");
-            const sharePreviewButton = document.getElementById("sharePreviewButton");
-            const previewImage = document.getElementById("designPreview");
-
-            // 저장하기 버튼: 미리보기 이미지를 PNG 파일로 다운로드
-            savePreviewButton.addEventListener("click", function () {
-                const tempCanvas = document.createElement("canvas");
-                const ctx = tempCanvas.getContext("2d");
-                tempCanvas.width = previewImage.naturalWidth;
-                tempCanvas.height = previewImage.naturalHeight;
-                ctx.drawImage(previewImage, 0, 0);
-                const dataURL = tempCanvas.toDataURL("image/png");
-                const link = document.createElement("a");
-                link.href = dataURL;
-                link.download = "design_preview.png";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
-
-            // 공유하기 버튼: 미리보기 이미지를 클립보드에 복사
-            sharePreviewButton.addEventListener("click", async function () {
-                const tempCanvas = document.createElement("canvas");
-                const ctx = tempCanvas.getContext("2d");
-                tempCanvas.width = previewImage.naturalWidth;
-                tempCanvas.height = previewImage.naturalHeight;
-                ctx.drawImage(previewImage, 0, 0);
-                tempCanvas.toBlob(async function(blob) {
-                    try {
-                        const item = new ClipboardItem({ "image/png": blob });
-                        await navigator.clipboard.write([item]);
-                        alert("이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");
-                    } catch (err) {
-                        console.error("이미지 복사 실패", err);
-                        alert("이미지 복사에 실패했습니다.");
-                    }
-                }, "image/png");
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-          // 예시: 스케치 파일이 준비된 FormData 객체 (여기서는 'formData'가 이미 준비되었다고 가정)
-          fetch("https://dzbqrrjyhewyahrb.tunnel-pt.elice.io/proxy/8000/inference", {
-            method: "POST",
-            body: formData
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error("서버 응답 오류: " + response.statusText);
-            }
-            return response.blob();
-          })
-          .then(blob => {
-            const reader = new FileReader();
-            reader.onloadend = function() {
-              document.getElementById("designPreview").src = reader.result;
-            };
-            reader.readAsDataURL(blob);
-          })
-          .catch(error => {
-            console.error("이미지 전송 실패:", error);
-            alert("이미지 전송에 실패했습니다. 콘솔을 확인하세요.");
-          });
-        });
-      </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
+            
+            // 버전 관리 시스템
+            let currentVersion = 1.0;
+            let versions = [];
+            
+            // 초기 이미지 로드 후 첫 버전 저장
             const previewImage = document.getElementById("designPreview");
             const storedImage = localStorage.getItem("aiDesignImage");
+            
             if (storedImage) {
                 previewImage.src = storedImage;
-                // 이미지를 삭제하지 않고 유지
-                // localStorage.removeItem("aiDesignImage"); <- 이 줄을 제거 또는 주석 처리
+                previewImage.onload = function() {
+                    // 첫 버전 저장
+                    saveVersion("초기 AI 디자인", storedImage);
+                };
             }
+            
+            // 새 버전 저장 함수
+            function saveVersion(description, imageData) {
+                const versionNum = currentVersion.toFixed(1);
+                const versionDate = formattedDate;
+                
+                // 버전 데이터 생성
+                const version = {
+                    number: versionNum,
+                    date: versionDate,
+                    description: description,
+                    imageData: imageData
+                };
+                
+                // 버전 배열에 추가
+                versions.push(version);
+                
+                // UI 업데이트
+                updateVersionsList();
+                
+                // 버전 번호 증가
+                currentVersion += 0.1;
+                
+                // 현재 버전 표시 업데이트
+                document.getElementById('previewVersion').textContent = `현재 버전: v${versionNum}`;
+            }
+            
+            // 버전 목록 UI 업데이트
+            function updateVersionsList() {
+                const versionsList = document.getElementById('savedVersionList');
+                versionsList.innerHTML = '';
+                
+                // 최신 버전이 맨 위에 오도록 역순으로 표시
+                versions.slice().reverse().forEach(version => {
+                    const versionItem = document.createElement('div');
+                    versionItem.className = 'p-4 rounded-xl border-2 border-gray-100 hover:border-indigo-500 transition-all cursor-pointer saved-version';
+                    versionItem.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="font-medium">버전 ${version.number}</p>
+                            <p class="text-sm text-gray-500">${version.date}</p>
+                        </div>
+                        <p class="text-sm text-gray-600">${version.description}</p>
+                    `;
+                    
+                    // 클릭 이벤트: 해당 버전의 이미지로 복원
+                    versionItem.addEventListener('click', function() {
+                        previewImage.src = version.imageData;
+                        document.getElementById('previewVersion').textContent = `현재 버전: v${version.number}`;
+                        document.getElementById('previewDate').textContent = `최종 수정: ${version.date}`;
+                    });
+                    
+                    versionsList.appendChild(versionItem);
+                });
+            }
+            
+            // 피드백 제출 성공 후 새 버전 저장을 위한 함수 전역으로 노출
+            window.saveNewVersion = function(description, imageData) {
+                saveVersion(description, imageData);
+            };
         });
 
+        // 다음 페이지로 이동
         function goToPage() {
-            // 현재 이미지를 localStorage에 저장
             const previewImage = document.getElementById("designPreview");
             if (previewImage.src) {
                 localStorage.setItem("aiDesignImage", previewImage.src);
             }
             window.location.href = "3_recommend.html";
         }
+    </script>
+    
+    <!-- 이미지 조작 관련 스크립트 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const savePreviewButton = document.getElementById("savePreviewButton");
+            const sharePreviewButton = document.getElementById("sharePreviewButton");
+            const previewImage = document.getElementById("designPreview");
+            const loadingIndicator = document.getElementById("loadingIndicator");
+
+            // 저장하기 버튼
+            savePreviewButton.addEventListener("click", function () {
+                if (!previewImage.src) return;
+                
+                const tempCanvas = document.createElement("canvas");
+                const ctx = tempCanvas.getContext("2d");
+                tempCanvas.width = previewImage.naturalWidth || 512;
+                tempCanvas.height = previewImage.naturalHeight || 512;
+                ctx.drawImage(previewImage, 0, 0);
+                const dataURL = tempCanvas.toDataURL("image/png");
+                
+                const link = document.createElement("a");
+                link.href = dataURL;
+                link.download = `가구디자인_${new Date().toISOString().slice(0,10)}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // 공유하기 버튼
+            sharePreviewButton.addEventListener("click", async function () {
+                if (!previewImage.src) return;
+                
+                try {
+                    const tempCanvas = document.createElement("canvas");
+                    const ctx = tempCanvas.getContext("2d");
+                    tempCanvas.width = previewImage.naturalWidth || 512;
+                    tempCanvas.height = previewImage.naturalHeight || 512;
+                    ctx.drawImage(previewImage, 0, 0);
+                    
+                    tempCanvas.toBlob(async function(blob) {
+                        try {
+                            const item = new ClipboardItem({ "image/png": blob });
+                            await navigator.clipboard.write([item]);
+                            alert("이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");
+                        } catch (err) {
+                            console.error("이미지 복사 실패", err);
+                            // 대체 방법: 캔버스 내용을 새 창에 표시
+                            const dataUrl = tempCanvas.toDataURL('image/png');
+                            const newWindow = window.open();
+                            newWindow.document.write(`<img src="${dataUrl}" alt="가구 디자인">`);
+                        }
+                    }, "image/png");
+                } catch (err) {
+                    console.error("클립보드 공유 실패", err);
+                    alert("이미지 공유에 실패했습니다.");
+                }
+            });
+
+            // 로딩 표시 관리 함수
+            window.showLoading = function() {
+                loadingIndicator.style.display = 'block';
+                previewImage.style.opacity = '0.3';
+            }
+            
+            window.hideLoading = function() {
+                loadingIndicator.style.display = 'none';
+                previewImage.style.opacity = '1';
+            }
+        });
+    </script>
+    
+    <!-- 맞춤법 검사 스크립트 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const feedbackTextEl = document.getElementById("feedbackPrompt");
+            const resultBox = document.getElementById("spellResult");
+            const spellCheckBtn = document.getElementById("spellCheckBtn");
+            
+            spellCheckBtn.addEventListener("click", function() {
+                const text = feedbackTextEl.value;
+                if (!text.trim()) {
+                    alert("검사할 텍스트를 입력해주세요.");
+                    return;
+                }
+                
+                // 결과 영역 표시 및 로딩 상태 표시
+                resultBox.classList.remove("hidden");
+                resultBox.textContent = "맞춤법 검사 중...";
+                
+                fetch("https://99ed-219-240-96-223.ngrok-free.app/check", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: text })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        resultBox.innerHTML = `<span class="text-red-500">오류 발생: ${data.error}</span>`;
+                    } else {
+                        // 결과 표시
+                        if (data.checked_text === text) {
+                            resultBox.innerHTML = `<span class="text-green-500">맞춤법 오류가 없습니다.</span>`;
+                        } else {
+                            resultBox.innerHTML = `
+                                <div class="mb-2 text-green-600 font-medium">맞춤법 교정 결과:</div>
+                                <div class="text-gray-700">${data.checked_text}</div>
+                            `;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("맞춤법 검사 실패:", error);
+                    resultBox.innerHTML = `<span class="text-red-500">맞춤법 검사에 실패했습니다.</span>`;
+                });
+            });
+        });
+    </script>
+    
+    <!-- 피드백 제출 및 이미지 수정 요청 -->
+    <script>
+        document.getElementById("feedbackSubmit").addEventListener("click", async function() {
+            const prompt = document.getElementById("feedbackPrompt").value;
+            if (!prompt) {
+                alert("수정할 내용을 입력해주세요.");
+                return;
+            }
+        
+            const imageUrl = document.getElementById("designPreview").src;
+            if (!imageUrl) {
+                alert("수정할 이미지가 없습니다.");
+                return;
+            }
+            
+            try {
+                const imageResponse = await fetch(imageUrl);
+                if (!imageResponse.ok) {
+                    throw new Error("이미지 불러오기 실패");
+                }
+                const blob = await imageResponse.blob();
+                const file = new File([blob], "original.png", { type: "image/png" });
+        
+                const formData = new FormData();
+                formData.append("original_image", file);
+                formData.append("prompt", prompt);
+        
+                window.showLoading();
+        
+                const response = await fetch("http://localhost:8000/edit-image", {
+                    method: "POST",
+                    body: formData
+                });
+        
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "수정 요청 실패");
+                }
+        
+                const data = await response.json();
+                if (data.result_url) {
+                    document.getElementById("designPreview").src = data.result_url;
+                    window.saveNewVersion(prompt, data.result_url);
+                } else {
+                    alert("결과 이미지가 없습니다.");
+                }
+            } catch (error) {
+                console.error("수정 요청 실패:", error);
+                alert("수정 요청에 실패했습니다: " + error.message);
+            } finally {
+                window.hideLoading();
+            }
+        });
     </script>
 </body>
 </html>

@@ -143,31 +143,31 @@
                 pencilBtn.addEventListener("click", function() {
                     currentTool = "pencil";
                     ctx.strokeStyle = "#FFFFFF"; // 흰색 선
-                    ctx.lineWidth = parseInt(sizeSlider.value);
+                    ctx.lineWidth = parseFloat(sizeSlider.value); // parseFloat로 소수점 처리
                     updateActiveTool(pencilBtn);
                 });
                 lineBtn.addEventListener("click", function() {
                     currentTool = "line";
                     ctx.strokeStyle = "#FFFFFF";
-                    ctx.lineWidth = parseInt(sizeSlider.value);
+                    ctx.lineWidth = parseFloat(sizeSlider.value);
                     updateActiveTool(lineBtn);
                 });
                 circleBtn.addEventListener("click", function() {
                     currentTool = "circle";
                     ctx.strokeStyle = "#FFFFFF";
-                    ctx.lineWidth = parseInt(sizeSlider.value);
+                    ctx.lineWidth = parseFloat(sizeSlider.value);
                     updateActiveTool(circleBtn);
                 });
                 squareBtn.addEventListener("click", function() {
                     currentTool = "square";
                     ctx.strokeStyle = "#FFFFFF";
-                    ctx.lineWidth = parseInt(sizeSlider.value);
+                    ctx.lineWidth = parseFloat(sizeSlider.value);
                     updateActiveTool(squareBtn);
                 });
                 eraserBtn.addEventListener("click", function() {
                     currentTool = "eraser";
                     ctx.strokeStyle = "#000000"; // 배경색과 동일하게 지우기
-                    ctx.lineWidth = parseInt(sizeSlider.value) + 5;
+                    ctx.lineWidth = parseFloat(sizeSlider.value) + 2; // 지우개는 펜보다 조금 크게 (+2)
                     updateActiveTool(eraserBtn);
                 });
                 clearBtn.addEventListener("click", function() {
@@ -255,6 +255,17 @@
                 } else {
                     clearCanvas();
                 }
+                
+                // 크기 슬라이더 변경 이벤트
+                sizeSlider.addEventListener("input", function() {
+                    const size = parseFloat(this.value);
+                    if (currentTool === "eraser") {
+                        ctx.lineWidth = size + 2; // 지우개일 경우 더 크게
+                    } else {
+                        ctx.lineWidth = size;
+                    }
+                    updateSizePreview();
+                });
                 
                 // [변경 전] 기본 활성 도구 설정 코드는 제거되어, 로드시에는 어떤 도구도 하이라이트되지 않음.
             });
@@ -347,7 +358,7 @@
                                 <!-- 크기 -->
                                 <div>
                                     <label class="block text-sm text-gray-600 mb-2">크기</label>
-                                    <input id="sizeSlider" type="range" class="w-full accent-indigo-600" min="0.5" max="30" value="2">
+                                    <input id="sizeSlider" type="range" class="w-full accent-indigo-600" min="0.2" max="10" step="0.2" value="1">
                                 </div>
                                 <!-- 크기 미리보기 박스 -->
                                 <div class="bg-gray-100 p-4 rounded-2xl flex justify-center items-center h-[100px] w-full">
@@ -363,6 +374,35 @@
                             <div class="gradient-border rounded-2xl bg-white p-4 flex justify-center items-center">
                                 <canvas id="sketchCanvas" width="256" height="256" class="w-full h-auto rounded-xl" style="max-width: 710px; aspect-ratio: 1 / 1;"></canvas>
                             </div>
+                        </div>
+                        
+                        <!-- 레퍼런스 이미지 섹션 (캔버스 아래에 추가) -->
+                        <div class="mt-8 bg-white rounded-3xl p-6 shadow-lg card-hover">
+                            <h3 class="text-lg font-bold mb-6 gradient-text">스케치 레퍼런스</h3>
+                            <div class="grid grid-cols-5 gap-4">
+                                <!-- 5개의 레퍼런스 이미지 -->
+                                <div class="reference-item cursor-pointer transition-all hover:scale-105">
+                                    <img src="img/reference1.png" alt="소파" class="rounded-xl w-full h-32 object-cover shadow-md">
+                                    <p class="mt-2 text-sm font-medium text-center">소파</p>
+                                </div>
+                                <div class="reference-item cursor-pointer transition-all hover:scale-105">
+                                    <img src="img/reference2.png" alt="옷장" class="rounded-xl w-full h-32 object-cover shadow-md">
+                                    <p class="mt-2 text-sm font-medium text-center">장롱</p>
+                                </div>
+                                <div class="reference-item cursor-pointer transition-all hover:scale-105">
+                                    <img src="img/reference3.png" alt="의자" class="rounded-xl w-full h-32 object-cover shadow-md">
+                                    <p class="mt-2 text-sm font-medium text-center">의자</p>
+                                </div>
+                                <div class="reference-item cursor-pointer transition-all hover:scale-105">
+                                    <img src="img/reference4.png" alt="테이블" class="rounded-xl w-full h-32 object-cover shadow-md">
+                                    <p class="mt-2 text-sm font-medium text-center">테이블</p>
+                                </div>
+                                <div class="reference-item cursor-pointer transition-all hover:scale-105">
+                                    <img src="img/reference5.png" alt="책상" class="rounded-xl w-full h-32 object-cover shadow-md">
+                                    <p class="mt-2 text-sm font-medium text-center">모니터</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-500 text-sm mt-3 text-center">이미지를 클릭하여 캔버스에 적용해보세요</p>
                         </div>
                     </div>
         
@@ -396,41 +436,6 @@
                                 <span>공 유 하 기</span>
                             </button>
                         </div>
-        
-                        <!-- References Carousel -->
-                        <div id="referencesCarousel" class="relative bg-white rounded-3xl p-6 shadow-lg card-hover">
-                            <h3 class="text-lg font-bold mb-6 gradient-text">References</h3>
-                            <div class="overflow-hidden">
-                                <div id="carouselInner">
-                                    <div class="reference-item text-center">
-                                        <img src="img/reference1.png" alt="소파" class="mx-auto rounded-xl w-full h-48 object-cover shadow-md">
-                                        <p class="mt-1 text-sm font-medium text-gray-700">소파</p>
-                                    </div>
-                                    <div class="reference-item text-center">
-                                        <img src="img/reference2.png" alt="장롱" class="mx-auto rounded-xl w-full h-48 object-cover shadow-md">
-                                        <p class="mt-1 text-sm font-medium text-gray-700">장롱</p>
-                                    </div>
-                                    <div class="reference-item text-center">
-                                        <img src="img/reference3.png" alt="의자" class="mx-auto rounded-xl w-full h-48 object-cover shadow-md">
-                                        <p class="mt-1 text-sm font-medium text-gray-700">의자</p>
-                                    </div>
-                                    <div class="reference-item text-center">
-                                        <img src="img/reference4.png" alt="테이블" class="mx-auto rounded-xl w-full h-48 object-cover shadow-md">
-                                        <p class="mt-1 text-sm font-medium text-gray-700">테이블</p>
-                                    </div>
-                                    <div class="reference-item text-center">
-                                        <img src="img/reference5.png" alt="모니터" class="mx-auto rounded-xl w-full h-48 object-cover shadow-md">
-                                        <p class="mt-1 text-sm font-medium text-gray-700">모니터</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <button id="prevButton" class="absolute left-2 top-1/2 transform -translate-y-1/2 focus:outline-none text-3xl text-gray-300 hover:text-purple-400">
-                                ⟨
-                            </button>
-                            <button id="nextButton" class="absolute right-2 top-1/2 transform -translate-y-1/2 focus:outline-none text-3xl text-gray-300 hover:text-purple-400">
-                                ⟩
-                            </button>
-                        </div>
                     </div>
                 </div>
                 
@@ -455,36 +460,36 @@
         </main>
         
         <script>
-            function goToHomePage() {
-                window.location.href = "index.html";
+    function goToHomePage() {
+        window.location.href = "index.html";
+    }
+    async function goToAIDesign() {
+        const canvas = document.getElementById("sketchCanvas");
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+        const formData = new FormData();
+        formData.append("file", blob, "sketch.png");
+
+        try {
+            const response = await fetch("https://99ed-219-240-96-223.ngrok-free.app/inference", {
+                method: "POST",
+                body: formData
+            });
+            if (!response.ok) {
+                throw new Error("서버 응답 오류: " + response.statusText);
             }
-            async function goToAIDesign() {
-                const canvas = document.getElementById("sketchCanvas");
-                const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-                const formData = new FormData();
-                formData.append("file", blob, "sketch.png");
-        
-                try {
-                    const response = await fetch("https://dzbqrrjyhewyahrb.tunnel-pt.elice.io/proxy/8000/inference", {
-                        method: "POST",
-                        body: formData
-                    });
-                    if (!response.ok) {
-                        throw new Error("서버 응답 오류: " + response.statusText);
-                    }
-                    const resultBlob = await response.blob();
-                    const dataUrl = await new Promise(resolve => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result);
-                        reader.readAsDataURL(resultBlob);
-                    });
-                    localStorage.setItem("aiDesignImage", dataUrl);
-                    window.location.href = "2_AI.html";
-                } catch (error) {
-                    console.error("서버 전송 실패:", error);
-                }
-            }
-        </script>
+            const resultBlob = await response.blob();
+            const dataUrl = await new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(resultBlob);
+            });
+            localStorage.setItem("aiDesignImage", dataUrl);
+            window.location.href = "2_AI.html";
+        } catch (error) {
+            console.error("서버 전송 실패:", error);
+        }
+    }
+</script>
         
         <script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -516,10 +521,19 @@
                 fileInput.type = "file";
                 fileInput.accept = "image/*";
         
+                // 파일 선택 버튼 클릭 시 파일 선택 다이얼로그 열기
                 uploadArea.querySelector("button").addEventListener("click", function () {
                     fileInput.click();
                 });
         
+                // 파일이 선택되었을 때 처리 - 여기가 누락되었음
+                fileInput.addEventListener("change", function(e) {
+                    if (this.files && this.files[0]) {
+                        handleFileUpload(this.files[0]);
+                    }
+                });
+        
+                // 드래그 앤 드롭 이벤트 처리
                 uploadArea.addEventListener("dragover", function (event) {
                     event.preventDefault();
                     uploadArea.style.borderColor = "#A855F7";
@@ -629,31 +643,5 @@
             });
         </script>
         
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                const carouselInner = document.getElementById("carouselInner");
-                const prevButton = document.getElementById("prevButton");
-                const nextButton = document.getElementById("nextButton");
-                const totalItems = carouselInner.children.length;
-                let currentIndex = 0;
-        
-                function updateCarousel() {
-                    const offset = -currentIndex * carouselInner.clientWidth;
-                    carouselInner.style.transform = `translateX(${offset}px)`;
-                }
-        
-                prevButton.addEventListener("click", function() {
-                    currentIndex = (currentIndex - 1 + totalItems) % totalItems;
-                    updateCarousel();
-                });
-        
-                nextButton.addEventListener("click", function() {
-                    currentIndex = (currentIndex + 1) % totalItems;
-                    updateCarousel();
-                });
-        
-                window.addEventListener("resize", updateCarousel);
-            });
-        </script>
     </body>
 </html>
