@@ -413,15 +413,28 @@
         
         // 페이지 이동 함수
         function goToPage() {
-            // 이미 생성된 이미지(예: design canvas에서 얻은 base64 데이터)를 localStorage에 저장
+            // 이미지가 존재하는지 확인
             const previewImage = document.getElementById("designPreview");
             if (!previewImage.src || previewImage.src === "about:blank") {
                 alert("생성된 이미지가 없습니다. 먼저 이미지를 생성해주세요.");
                 return;
             }
-            localStorage.setItem("aiDesignImage", previewImage.src);
-            // 서버 저장 없이 바로 추천페이지로 이동
-            window.location.href = "3_recommend.html";
+            
+            // 이미지가 URL인 경우 (아직 다운로드되지 않은 경우) 다운로드 후 저장
+            if (previewImage.src.startsWith("http") && !previewImage.src.startsWith("data:")) {
+                downloadAndSaveImage(previewImage.src, "가구 이미지")
+                    .then(() => {
+                        // 다운로드 성공 후 페이지 이동
+                        window.location.href = "3_recommend.html";
+                    })
+                    .catch(error => {
+                        alert("이미지 처리 중 오류가 발생했습니다: " + error.message);
+                    });
+            } else {
+                // 이미 로컬에 저장된 이미지인 경우 바로 이동
+                localStorage.setItem("aiDesignImage", previewImage.src);
+                window.location.href = "3_recommend.html";
+            }
         }
     </script>
 
@@ -505,14 +518,8 @@
                 }
                 const data = await response.json();
                 if (data.result_url) {
-                    document.getElementById("designPreview").src = data.result_url;
-                    // 함수 존재 여부 확인 후 호출
-                    if (typeof window.saveNewVersion === 'function') {
-                        window.saveNewVersion(prompt, data.result_url);
-                    } else {
-                        console.warn("saveNewVersion 함수가 정의되지 않았습니다.");
-                        localStorage.setItem("aiDesignImage", data.result_url);
-                    }
+                    // DALL-E URL을 가져와서 이미지를 다운로드한 후 base64로 변환하여 저장
+                    await downloadAndSaveImage(data.result_url, prompt);
                 } else {
                     alert("결과 이미지가 없습니다.");
                 }
@@ -523,6 +530,60 @@
                 window.hideLoading();
             }
         });
+
+        // 추가: 이미지 URL을 다운로드하고 Base64로 변환하여 저장하는 함수
+        async function downloadAndSaveImage(imageUrl, prompt) {
+            try {
+                console.log("DALL-E 이미지 다운로드 중:", imageUrl);
+                
+                // 이미지 다운로드
+                const imageResponse = await fetch(imageUrl);
+                if (!imageResponse.ok) {
+                    throw new Error("DALL-E 이미지 다운로드 실패");
+                }
+                
+                // 이미지 블롭으로 변환
+                const imageBlob = await imageResponse.blob();
+                
+                // 캔버스에 그려서 크기 조정 및 포맷 최적화
+                const img = new Image();
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 이미지 로드 완료 대기
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                    img.src = URL.createObjectURL(imageBlob);
+                });
+                
+                // 캔버스 크기 설정 (원본 비율 유지)
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                // 이미지 그리기
+                ctx.drawImage(img, 0, 0);
+                
+                // PNG 형식으로 데이터 URL 생성
+                const dataURL = canvas.toDataURL('image/png');
+                
+                // localStorage에 저장
+                localStorage.setItem("aiDesignImage", dataURL);
+                
+                // 디자인 이미지 요소에 표시
+                document.getElementById("designPreview").src = dataURL;
+                console.log("이미지가 다운로드되어 로컬에 저장되었습니다.");
+                
+                // saveNewVersion 함수 호출
+                if (typeof window.saveNewVersion === 'function') {
+                    window.saveNewVersion(prompt, dataURL);
+                }
+                
+            } catch (error) {
+                console.error("이미지 다운로드 및 변환 오류:", error);
+                throw new Error("이미지 다운로드 실패: " + error.message);
+            }
+        }
     </script>
 </body>
 </html>

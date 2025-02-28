@@ -387,7 +387,6 @@ class RecommendRequest(BaseModel):
     min_price: int = 0
     max_price: int = 100000000
 
-# recommend 엔드포인트 수정
 @app.post("/recommend")
 async def recommend_furniture_endpoint(request: RecommendRequest):
     """
@@ -401,73 +400,107 @@ async def recommend_furniture_endpoint(request: RecommendRequest):
         
         # 이미지 데이터 처리 시작
         try:
-            image_data = request.image_data
-            print(f"수신된 이미지 데이터 길이: {len(image_data)} bytes")
+            # 이미지 데이터 길이 체크
+            if not request.image_data:
+                raise HTTPException(status_code=400, detail="이미지 데이터가 비어있습니다")
+                
+            print(f"수신된 이미지 데이터 길이: {len(request.image_data)}")
             
-            # 패딩 검사 및 수정
+            # base64 패딩 문자 추가 (필요한 경우)
+            image_data = request.image_data
             missing_padding = 4 - len(image_data) % 4
             if missing_padding < 4:
                 image_data += '=' * missing_padding
-                print(f"패딩 추가: {missing_padding}개")
-                
+                print(f"Base64 패딩 {missing_padding}개 추가됨")
+            
             # Base64 디코딩
             try:
-                image_bytes = base64.b64decode(image_data, validate=True)
-                print(f"Base64 디코딩 성공: {len(image_bytes)} bytes")
+                import binascii  # 명시적으로 추가
                 
-                # 이미지 파일 헤더 검증 (옵션)
-                if len(image_bytes) > 10:
-                    header = image_bytes[:12]
-                    hex_header = ' '.join(f'{b:02x}' for b in header)
-                    print(f"이미지 헤더 (hex): {hex_header}")
-                
-                # 명시적으로 BytesIO 객체로 변환
-                image_stream = BytesIO(image_bytes)
-                image_stream.seek(0)  # 스트림 위치 리셋
-                
-                # 다양한 이미지 형식 지원 시도
+                # 디코딩 시도
                 try:
-                    image = Image.open(image_stream)
-                    # 이미지 정보 출력
-                    print(f"이미지 열기 성공: 사이즈={image.size}, 모드={image.mode}, 형식={image.format}")
+                    image_bytes = base64.b64decode(image_data, validate=True)
+                    print(f"Base64 디코딩 성공: {len(image_bytes)} 바이트")
+                except binascii.Error as e:
+                    print(f"엄격한 검증 실패: {str(e)}, 느슨한 검증으로 재시도")
+                    # 느슨한 검증으로 다시 시도
+                    image_bytes = base64.b64decode(image_data, validate=False)
+                    print(f"느슨한 검증으로 디코딩 성공: {len(image_bytes)} 바이트")
+                
+                # 이미지 바이트 데이터 유효성 검사
+                if len(image_bytes) < 100:
+                    raise HTTPException(status_code=400, detail=f"디코딩된 이미지 데이터가 너무 작습니다 ({len(image_bytes)} 바이트)")
+                
+                # 디버그: 첫 바이트 확인
+                print(f"이미지 데이터 처음 20바이트: {' '.join(f'{b:02x}' for b in image_bytes[:20])}")
+                
+                # PIL로 이미지 열기
+                from io import BytesIO
+                image_io = BytesIO(image_bytes)
+                image_io.seek(0)  # 스트림 포인터 리셋
+                
+                try:
+                    # 다양한 형식 지원 시도
+                    image = Image.open(image_io)
+                    print(f"이미지 로드 성공: 크기={image.size}, 모드={image.mode}, 형식={image.format}")
                     
-                    # RGB로 변환 확실히
+                    # RGB로 변환 (그레이스케일 등 다른 모드의 이미지도 처리)
                     if image.mode != "RGB":
                         image = image.convert("RGB")
-                        print("이미지를 RGB 모드로 변환했습니다.")
+                        print(f"이미지 모드 변환: {image.mode} -> RGB")
+                    
+                    # 임베딩 추출
+                    query_embedding = extract_embedding(image)
+                    print("CLIP 임베딩 추출 성공")
+                    
+                    # 가구 추천
+                    recommended_furniture = find_similar_furniture(query_embedding, min_price, max_price)
+                    print(f"추천 완료: {len(recommended_furniture)}개 가구 찾음")
+                    
+                    # 결과 반환
+                    return {"recommendations": recommended_furniture}
                     
                 except Exception as img_err:
-                    print(f"PIL 이미지 열기 실패: {str(img_err)}")
+                    import traceback
+                    traceback.print_exc()
+                    print(f"이미지 처리 오류: {str(img_err)}")
                     
-                    # 디버깅을 위해 잘못된 이미지 저장
-                    debug_file = f"/tmp/debug_image_{int(time.time())}.bin"
-                    with open(debug_file, 'wb') as df:
-                        df.write(image_bytes)
-                    print(f"디버그용 파일 저장됨: {debug_file}")
+                    # 파일 저장 시도 (디버깅용)
+                    try:
+                        import os, time
+                        debug_dir = "/tmp" if os.path.exists("/tmp") else os.path.dirname(__file__)
+                        debug_file = os.path.join(debug_dir, f"debug_image_{int(time.time())}.bin")
+                        with open(debug_file, 'wb') as f:
+                            f.write(image_bytes)
+                        print(f"디버그 파일 저장됨: {debug_file}")
+                    except Exception as save_err:
+                        print(f"디버그 파일 저장 실패: {str(save_err)}")
                     
-                    raise HTTPException(status_code=400, detail=f"이미지 형식 오류: {str(img_err)}")
+                    raise HTTPException(status_code=400, detail=f"이미지 처리 오류: {str(img_err)}")
                 
-                # 임베딩 추출 및 추천 진행
-                query_embedding = extract_embedding(image)
-                recommended_furniture = find_similar_furniture(query_embedding, min_price, max_price)
-                print(f"최종 추천된 가구 개수: {len(recommended_furniture)}개")
-                return {"recommendations": recommended_furniture}
+            except binascii.Error as base64_err:
+                print(f"Base64 디코딩 오류: {str(base64_err)}")
+                raise HTTPException(status_code=400, detail=f"잘못된 Base64 인코딩: {str(base64_err)}")
                 
-            except binascii.Error as b64_err:
-                print(f"Base64 디코딩 오류: {str(b64_err)}")
-                raise HTTPException(status_code=400, detail=f"잘못된 Base64 인코딩: {str(b64_err)}")
-                
-        except Exception as img_proc_err:
-            print(f"이미지 처리 중 예외 발생: {str(img_proc_err)}")
+        except HTTPException:
+            # 이미 적절한 HTTP 예외가 발생했으므로 그대로 다시 발생시킴
+            raise
+            
+        except Exception as e:
             import traceback
             traceback.print_exc()
-            raise HTTPException(status_code=400, detail=f"이미지 처리 오류: {str(img_proc_err)}")
+            print(f"이미지 데이터 처리 중 예외: {str(e)}")
+            raise HTTPException(status_code=400, detail=f"이미지 데이터 처리 중 오류 발생: {str(e)}")
             
+    except HTTPException:
+        # 이미 적절한 HTTP 예외가 발생했으므로 그대로 다시 발생시킴
+        raise
+        
     except Exception as e:
-        print(f"추천 과정에서 일반 오류 발생: {str(e)}")
         import traceback
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"가구 추천 중 오류 발생: {str(e)}")
+        print(f"추천 프로세스 중 예기치 않은 오류: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"가구 추천 중 서버 오류 발생: {str(e)}")
 
 @app.get("/image/{filename}")
 async def get_image(filename: str):

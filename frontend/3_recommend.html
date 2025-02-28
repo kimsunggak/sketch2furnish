@@ -72,7 +72,17 @@
                         </div>
                         <div class="flex-grow">
                             <!-- 캔버스가 1:1 비율로 확대되어 나타납니다. -->
-                            <canvas id="viewerCanvas" class="w-full bg-gray-200 rounded-xl" style="aspect-ratio: 1 / 1;"></canvas>
+                            <canvas id="viewerCanvas" class="w-full bg-gray-200 rounded-xl mb-4" style="aspect-ratio: 1 / 1;"></canvas>
+                            
+                            <!-- 파일 업로드 영역 추가 -->
+                            <div class="mt-4 border-2 border-dashed border-indigo-300 rounded-xl p-4 text-center cursor-pointer hover:bg-indigo-50 transition-all" id="uploadArea">
+                                <svg class="w-8 h-8 mx-auto mb-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                <p class="text-sm text-gray-600 mb-1">PNG 이미지 업로드 후 다시 추천받기</p>
+                                <p class="text-xs text-gray-500">이미지를 끌어다 놓거나 클릭하세요</p>
+                                <input type="file" id="fileInput" accept="image/png,image/jpeg" class="hidden">
+                            </div>
                         </div>
                     </div>
 
@@ -128,14 +138,14 @@
             <div class="flex justify-center items-center space-x-6 mt-8">
                 <button id="saveProjectButton" class="bg-white text-gray-700 px-6 py-3 rounded-full hover:bg-gray-50 shadow-lg transition-all flex items-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
-                    <span>프로젝트 저장</span>
+                    <span>PNG로 다운로드</span>
                 </button>
                 <button id="shareProjectButton" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-full shadow-lg transition-all flex items-center space-x-2">
-                    <span>프로젝트 공유</span>
+                    <span>이미지 공유</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
                     </svg>
                 </button>
             </div>
@@ -144,80 +154,81 @@
     
     <!-- JavaScript: 추천 기능 구현 -->
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const viewerCanvas = document.getElementById('viewerCanvas');
-        const ctx = viewerCanvas.getContext('2d');
-        const storedImage = localStorage.getItem('aiDesignImage');
-        const applyPriceFilterButton = document.getElementById('applyPriceFilter');
-        const recommendationsContainer = document.querySelector('.grid-cols-2');
-        
-        // 로딩 상태 UI 컴포넌트
-        function showLoading() {
+document.addEventListener('DOMContentLoaded', function () {
+    const viewerCanvas = document.getElementById('viewerCanvas');
+    const ctx = viewerCanvas.getContext('2d');
+    const applyPriceFilterButton = document.getElementById('applyPriceFilter');
+    const recommendationsContainer = document.querySelector('.grid-cols-2');
+    const storedImage = localStorage.getItem('aiDesignImage');
+    
+    // 로딩 상태 UI 컴포넌트
+    function showLoading() {
+        recommendationsContainer.innerHTML = `
+            <div class="col-span-2 text-center py-10">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+                <p class="mt-4 text-gray-700">가구를 추천 중입니다...</p>
+            </div>
+        `;
+    }
+    
+    // 오류 표시 함수
+    function showError(message) {
+        console.error("오류:", message);
+        recommendationsContainer.innerHTML = `
+            <div class="col-span-2 text-center py-10">
+                <svg class="mx-auto h-12 w-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <p class="mt-4 text-red-500">${message}</p>
+            </div>
+        `;
+    }
+    
+    // 추천 결과 표시 함수
+    function displayRecommendations(products) {
+        if (!products || products.length === 0) {
             recommendationsContainer.innerHTML = `
                 <div class="col-span-2 text-center py-10">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-                    <p class="mt-4 text-gray-700">가구를 추천 중입니다...</p>
+                    <p class="text-gray-700">해당 조건의 추천 가구를 찾을 수 없습니다.</p>
                 </div>
             `;
+            return;
         }
         
-        // 오류 표시 함수
-        function showError(message) {
-            recommendationsContainer.innerHTML = `
-                <div class="col-span-2 text-center py-10">
-                    <svg class="mx-auto h-12 w-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <p class="mt-4 text-red-500">${message}</p>
-                </div>
-            `;
-        }
-        
-        // 추천 결과 표시 함수 (기존 코드 유지)
-        function displayRecommendations(products) {
-            if (!products || products.length === 0) {
-                recommendationsContainer.innerHTML = `
-                    <div class="col-span-2 text-center py-10">
-                        <p class="text-gray-700">해당 조건의 추천 가구를 찾을 수 없습니다.</p>
-                    </div>
-                `;
-                return;
+        recommendationsContainer.innerHTML = '';
+        products.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'bg-gray-50 rounded-xl p-4 shadow card-hover';
+            
+            let imgSrc = '';
+            try {
+                imgSrc = `https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/image/${encodeURIComponent(product.filename)}`;
+            } catch (e) {
+                imgSrc = "img/product_placeholder.png";
             }
             
-            // 기존 결과 표시 코드...
-            recommendationsContainer.innerHTML = '';
-            products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'bg-gray-50 rounded-xl p-4 shadow card-hover';
-                
-                let imgSrc = '';
-                try {
-                    imgSrc = `https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/image/${encodeURIComponent(product.filename)}`;
-                } catch (e) {
-                    imgSrc = "img/product_placeholder.png";
-                }
-                
-                productCard.innerHTML = `
-                    <img src="${imgSrc}" 
-                         alt="${product.category || '가구'}" 
-                         class="w-full h-40 object-cover rounded-md mb-4"
-                         onerror="this.onerror=null; this.src='img/product_placeholder.png';">
-                    <h4 class="font-bold text-gray-700">${product.category || '가구'}</h4>
-                    <p class="text-sm text-gray-500">${product.price || "가격 정보 없음"} | ${product.brand || "브랜드 정보 없음"}</p>
-                    <a href="${product.coupang_link || "#"}" target="_blank" 
-                       class="mt-2 text-indigo-600 text-sm block hover:underline">
-                       제품 보기
-                    </a>
-                `;
-                recommendationsContainer.appendChild(productCard);
-            });
-        }
-        
-        // 해결책 1: 페이지 로드 시 더 안정적인 이미지 처리 방식 구현
-        async function loadAndProcessImage() {
+            productCard.innerHTML = `
+                <img src="${imgSrc}" 
+                     alt="${product.category || '가구'}" 
+                     class="w-full h-40 object-cover rounded-md mb-4"
+                     onerror="this.onerror=null; this.src='img/product_placeholder.png';">
+                <h4 class="font-bold text-gray-700">${product.category || '가구'}</h4>
+                <p class="text-sm text-gray-500">${product.price || "가격 정보 없음"} | ${product.brand || "브랜드 정보 없음"}</p>
+                <a href="${product.coupang_link || "#"}" target="_blank" 
+                   class="mt-2 text-indigo-600 text-sm block hover:underline">
+                   제품 보기
+                </a>
+            `;
+            recommendationsContainer.appendChild(productCard);
+        });
+    }
+    
+    // 이미지를 캔버스에 로드하고 렌더링하는 함수
+    async function loadImageToCanvas() {
+        return new Promise((resolve, reject) => {
             if (!storedImage) {
-                // 이미지가 없는 경우 처리
+                // 이미지가 없는 경우
                 viewerCanvas.width = 500;
                 viewerCanvas.height = 500;
                 ctx.fillStyle = "#f3f4f6";
@@ -227,197 +238,281 @@
                 ctx.textAlign = "center";
                 ctx.fillText("이미지가 준비되지 않았습니다.", viewerCanvas.width/2, viewerCanvas.height/2);
                 ctx.fillText("먼저 AI 디자인 생성을 완료해주세요.", viewerCanvas.width/2, viewerCanvas.height/2 + 30);
-                
-                showError("이미지가 없습니다. AI 디자인을 먼저 생성해주세요.");
+                reject(new Error("이미지가 없습니다"));
                 return;
             }
             
-            try {
-                console.log("이미지 로드 시작...");
+            console.log("이미지 로드 시작...");
+            
+            // 이미지 객체 생성
+            const img = new Image();
+            img.crossOrigin = 'anonymous';  // CORS 오류 방지
+            
+            // 이미지 로드 완료 이벤트
+            img.onload = function() {
+                console.log("이미지 로드 완료:", img.width, "x", img.height);
                 
-                // 이미지 타입에 따른 처리
-                if (storedImage.startsWith('data:image')) {
-                    // data URL인 경우
-                    console.log("Data URL 형식 감지됨");
-                    await loadImageFromDataURL(storedImage);
-                } else if (storedImage.startsWith('http')) {
-                    // 외부 URL인 경우
-                    console.log("HTTP URL 형식 감지됨");
-                    await loadImageFromURL(storedImage);
-                } else {
-                    // 그 외 (plain base64 등)
-                    console.log("다른 형식의 데이터 감지됨, data URL로 변환 시도");
-                    await loadImageFromDataURL('data:image/png;base64,' + storedImage);
-                }
+                // 캔버스 크기 설정
+                viewerCanvas.width = img.naturalWidth || 512;
+                viewerCanvas.height = img.naturalHeight || 512;
                 
-                // 이미지 로드 완료 후 추천 요청 시작
-                console.log("이미지 로드 완료, 추천 요청 시작");
-                await requestRecommendations();
+                // 이미지를 캔버스에 그리기
+                ctx.clearRect(0, 0, viewerCanvas.width, viewerCanvas.height);
+                ctx.drawImage(img, 0, 0);
                 
-            } catch (error) {
-                console.error("이미지 로드 실패:", error);
-                showError("이미지 로드에 실패했습니다: " + error.message);
-            }
+                resolve();
+            };
+            
+            // 이미지 로드 오류 처리
+            img.onerror = function(e) {
+                console.error("이미지 로드 오류:", e);
+                reject(new Error("이미지를 로드하지 못했습니다"));
+            };
+            
+            // 이미지 소스 설정 (URL 또는 DataURL)
+            img.src = storedImage;
+        });
+    }
+    
+    // 추천 요청 함수 (완전히 새로 작성)
+    async function requestRecommendations() {
+        const minPrice = parseInt(document.getElementById('minPrice').value) || 0;
+        const maxPrice = parseInt(document.getElementById('maxPrice').value) || 100000000;
+        
+        if (minPrice < 0 || (maxPrice > 0 && minPrice > maxPrice)) {
+            alert("유효하지 않은 가격 범위입니다.");
+            return;
         }
         
-        // 이미지 URL로부터 이미지 로드 함수
-        async function loadImageFromURL(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "anonymous"; // CORS 이슈 방지
-                
-                img.onload = function() {
-                    console.log("이미지 로드됨:", img.width, "x", img.height);
-                    // 캔버스 크기 설정
-                    viewerCanvas.width = img.width || 512;
-                    viewerCanvas.height = img.height || 512;
-                    
-                    // 이미지 그리기
-                    ctx.clearRect(0, 0, viewerCanvas.width, viewerCanvas.height);
-                    ctx.drawImage(img, 0, 0);
-                    
-                    resolve();
-                };
-                
-                img.onerror = function(e) {
-                    console.error("이미지 URL 로드 실패:", e);
-                    reject(new Error("이미지 로드에 실패했습니다"));
-                };
-                
-                img.src = url;
+        showLoading();
+        
+        try {
+            // 1. 캔버스에서 이미지 데이터 추출 (JPEG 형식, 품질 80%)
+            const canvasDataURL = viewerCanvas.toDataURL('image/jpeg', 0.8);
+            console.log("캔버스 데이터 URL 생성 완료 (길이:", canvasDataURL.length, ")");
+            
+            // 2. Base64 부분만 추출
+            const base64Data = canvasDataURL.split(',')[1];
+            console.log("Base64 데이터 추출 완료, 길이:", base64Data.length);
+            
+            // 3. 서버에 요청 전송
+            const response = await fetch('https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image_data: base64Data,
+                    min_price: minPrice,
+                    max_price: maxPrice
+                })
             });
-        }
-        
-        // data URL로부터 이미지 로드 함수
-        async function loadImageFromDataURL(dataURL) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                
-                img.onload = function() {
-                    console.log("Data URL 이미지 로드됨:", img.width, "x", img.height);
-                    // 캔버스 크기 설정
-                    viewerCanvas.width = img.width || 512;
-                    viewerCanvas.height = img.height || 512;
-                    
-                    // 이미지 그리기
-                    ctx.clearRect(0, 0, viewerCanvas.width, viewerCanvas.height);
-                    ctx.drawImage(img, 0, 0);
-                    
-                    resolve();
-                };
-                
-                img.onerror = function(e) {
-                    console.error("Data URL 이미지 로드 실패:", e);
-                    reject(new Error("Data URL 이미지 처리에 실패했습니다"));
-                };
-                
-                img.src = dataURL;
-            });
-        }
-        
-        // 해결책 2: 더 안정적인 추천 요청 및 base64 변환 과정
-        async function requestRecommendations() {
-            try {
-                // 가격 범위 가져오기
-                const minPrice = parseInt(document.getElementById('minPrice').value) || 0;
-                const maxPrice = parseInt(document.getElementById('maxPrice').value) || 100000000;
-                
-                // 유효성 검사
-                if (minPrice < 0 || (maxPrice > 0 && minPrice > maxPrice)) {
-                    alert("유효하지 않은 가격 범위입니다. 다시 확인해주세요.");
-                    return;
-                }
-                
-                // 로딩 표시 시작
-                showLoading();
-                
-                // 항상 캔버스에서 현재 이미지를 가져오는 방식으로 통일
-                console.log("캔버스에서 이미지 데이터 추출 시작...");
-                
-                // 캔버스에서 이미지 데이터 추출
-                const canvasDataURL = viewerCanvas.toDataURL('image/jpeg', 0.8); // JPEG으로 변환하여 크기 줄이기
-                console.log("캔버스에서 Data URL 추출 완료 (길이:", canvasDataURL.length, ")");
-                
-                // Base64 부분만 추출
-                const base64Data = canvasDataURL.split(',')[1];
-                if (!base64Data) {
-                    throw new Error("이미지 데이터 추출 실패");
-                }
-                
-                console.log("Base64 데이터 추출 완료 (길이:", base64Data.length, ")");
-                
-                // 서버 요청 전송
-                console.log("서버에 추천 요청 전송 중...");
-                const response = await fetch('https://jjaqzskahktzmmgb.tunnel-pt.elice.io/proxy/8000/recommend', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        image_data: base64Data,
-                        min_price: minPrice,
-                        max_price: maxPrice
-                    })
-                });
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`서버 오류 (${response.status}): ${errorText}`);
-                }
-                
-                const data = await response.json();
-                console.log("추천 결과 수신:", data);
-                
-                // 결과 표시
-                if (data.recommendations && data.recommendations.length > 0) {
-                    displayRecommendations(data.recommendations);
-                } else {
-                    displayRecommendations([]);
-                }
-                
-            } catch (error) {
-                console.error("추천 과정에서 오류 발생:", error);
-                showError(error.message || "추천 요청에 실패했습니다.");
+            
+            // 4. 응답 처리
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`서버 오류 (${response.status}): ${errorText}`);
             }
+            
+            const data = await response.json();
+            console.log("추천 결과 수신:", data);
+            
+            // 5. 추천 결과 표시
+            displayRecommendations(data.recommendations || []);
+            
+        } catch (error) {
+            console.error("추천 요청 실패:", error);
+            showError(error.message || "추천 요청 중 오류가 발생했습니다");
         }
-        
-        // 가격 필터 적용 버튼 이벤트
-        applyPriceFilterButton.addEventListener('click', requestRecommendations);
-        
-        // 프로젝트 저장 버튼 이벤트
-        const saveProjectButton = document.getElementById("saveProjectButton");
-        saveProjectButton.addEventListener("click", function () {
-            // 항상 현재 캔버스 내용을 저장
-            const dataURL = viewerCanvas.toDataURL('image/png');
-            const link = document.createElement("a");
+    }
+    
+    // 이미지 저장 버튼
+    document.getElementById("saveProjectButton").addEventListener("click", function() {
+        try {
+            // 캔버스에서 고품질 PNG 이미지 추출
+            const canvas = document.getElementById("viewerCanvas");
+            const dataURL = canvas.toDataURL('image/png', 1.0); // 1.0은 최고 품질
+            
+            // 파일명 생성 (날짜와 시간 포함)
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0,10).replace(/-/g,'');
+            const timeStr = now.toTimeString().slice(0,8).replace(/:/g,'');
+            const fileName = `dream_furniture_${dateStr}_${timeStr}.png`;
+            
+            // 다운로드 링크 생성
+            const link = document.createElement('a');
             link.href = dataURL;
-            link.download = "dream_furniture.png";
+            link.download = fileName;
+            
+            // 알림 메시지
+            alert(`"${fileName}"로 이미지를 저장합니다.\n다운로드 폴더에서 확인해주세요.`);
+            
+            // 다운로드 실행
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            console.log("이미지가 성공적으로 저장되었습니다:", fileName);
+        } catch (error) {
+            console.error("이미지 저장 오류:", error);
+            alert("이미지 저장에 실패했습니다: " + error.message);
+        }
+    });
+    
+    // 이미지 공유 버튼
+    document.getElementById("shareProjectButton").addEventListener("click", async function() {
+        try {
+            const blob = await new Promise(resolve => viewerCanvas.toBlob(resolve, 'image/png'));
+            if (!blob) throw new Error("이미지 생성 실패");
+            
+            const item = new ClipboardItem({ "image/png": blob });
+            await navigator.clipboard.write([item]);
+            alert("이미지가 클립보드에 복사되었습니다!");
+        } catch (error) {
+            console.error("이미지 공유 오류:", error);
+            alert("이미지 공유에 실패했습니다.");
+        }
+    });
+    
+    // 가격 필터 적용 버튼
+    applyPriceFilterButton.addEventListener('click', requestRecommendations);
+    
+    // 페이지 로드 시 실행
+    async function initialize() {
+        try {
+            // 1. 이미지 로드 및 캔버스에 그리기
+            await loadImageToCanvas();
+            // 2. 추천 요청
+            await requestRecommendations();
+        } catch (error) {
+            console.error("초기화 실패:", error);
+            showError("이미지가 없거나 로드할 수 없습니다. AI 디자인을 먼저 생성해주세요.");
+        }
+    }
+    
+    // 초기화 함수 실행
+    initialize();
+});
+
+    // 파일 업로드 관련 이벤트 리스너 추가
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        
+        // 클릭 시 파일 선택 다이얼로그 열기
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
         });
         
-        // 프로젝트 공유 버튼 이벤트
-        const shareProjectButton = document.getElementById("shareProjectButton");
-        shareProjectButton.addEventListener("click", async function () {
-            try {
-                const blob = await new Promise(resolve => {
-                    viewerCanvas.toBlob(resolve, 'image/png');
-                });
-                
-                if (!blob) {
-                    throw new Error("이미지 변환 실패");
-                }
-                
-                const item = new ClipboardItem({ "image/png": blob });
-                await navigator.clipboard.write([item]);
-                alert("프로젝트 이미지가 클립보드에 복사되었습니다!\n이미지를 붙여넣기하여 공유하세요.");
-            } catch (err) {
-                console.error("이미지 복사 실패", err);
-                alert("이미지 복사에 실패했습니다: " + err.message);
+        // 파일 선택 시
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                handleUploadedFile(this.files[0]);
             }
         });
         
-        // 페이지 로드 시 바로 이미지 처리 및 추천 시작
-        loadAndProcessImage();
+        // 드래그 앤 드롭 처리
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.add('border-indigo-500');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('border-indigo-500');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('border-indigo-500');
+            
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                handleUploadedFile(e.dataTransfer.files[0]);
+            }
+        });
+        
+        // 업로드된 파일 처리 함수
+        function handleUploadedFile(file) {
+            // 이미지 파일 타입 확인
+            if (!file.type.match('image.*')) {
+                alert('이미지 파일만 업로드 가능합니다.');
+                return;
+            }
+            
+            // 파일 로드 및 캔버스에 그리기
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    
+                    // 이미지 로드 완료 대기
+                    await new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = reject;
+                        img.src = e.target.result;
+                    });
+                    
+                    // 캔버스에 이미지 그리기
+                    const canvas = document.getElementById('viewerCanvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // 캔버스 크기 설정
+                    canvas.width = img.naturalWidth || 512;
+                    canvas.height = img.naturalHeight || 512;
+                    
+                    // 이미지 그리기
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // 로컬스토리지 업데이트
+                    const imageData = canvas.toDataURL('image/png');
+                    localStorage.setItem('aiDesignImage', imageData);
+                    
+                    // 알림 표시
+                    showNotification('이미지가 업로드되었습니다. 추천 시작...');
+                    
+                    // 업로드 후 바로 추천 요청 시작
+                    await requestRecommendations();
+                    
+                } catch (error) {
+                    console.error('이미지 로드 오류:', error);
+                    showError('이미지 처리 중 오류가 발생했습니다.');
+                }
+            };
+            
+            reader.onerror = function() {
+                showError('파일을 읽는 중 오류가 발생했습니다.');
+            };
+            
+            // 파일 읽기 시작
+            reader.readAsDataURL(file);
+        }
+        
+        // 알림 표시 함수
+        function showNotification(message) {
+            // 이미 있는 알림 제거
+            const existingNotification = document.getElementById('notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // 새 알림 생성
+            const notification = document.createElement('div');
+            notification.id = 'notification';
+            notification.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white py-3 px-6 rounded-lg shadow-lg z-50 transition-opacity duration-300';
+            notification.textContent = message;
+            
+            // 알림 표시 및 자동 제거
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
     });
 </script>
 </body>
