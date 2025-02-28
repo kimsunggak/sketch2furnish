@@ -272,14 +272,6 @@
 
                     <!-- Saved Version 영역 -->
                     <div id="versionsContainer" class="bg-white rounded-3xl p-6 shadow-lg card-hover">
-                        <h3 class="text-lg font-bold mb-6 gradient-text">Saved Version</h3>
-                        <div class="space-y-4" id="savedVersionList">
-                            <!-- 버전 리스트는 동적으로 생성됩니다 -->
-                        </div>
-                    </div>
-
-                    <!-- Recommendation 영역 다시 추가 -->
-                    <div class="bg-white rounded-3xl p-6 shadow-lg card-hover">
                         <h3 class="text-lg font-bold mb-6 gradient-text">Recommendation</h3>
                         <button onclick="goToPage()" class="tool-button w-full gradient-border rounded-xl p-4 text-left hover:bg-gray-50 transition-all group">
                             <div class="flex justify-between items-center">
@@ -297,8 +289,157 @@
             </div>
         </div>
     </main>
-    
+
     <!-- 스타일/재질 선택 및 버전 관리 -->
+    <script>        
+        document.addEventListener('DOMContentLoaded', function() {
+            // 현재 날짜 설정
+            const now = new Date();
+            const formattedDate = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+            document.getElementById('currentDate').textContent = formattedDate;
+
+            // 스타일/재질 선택 처리
+            const styleCards = document.querySelectorAll('.style-card');
+            styleCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const style = this.getAttribute('data-style');
+                    const material = this.getAttribute('data-material');
+                    let prompt = '';
+
+                    // 같은 카테고리의 다른 카드에서 active 클래스 제거
+                    const siblings = this.parentElement.querySelectorAll('.style-card');
+                    siblings.forEach(sibling => sibling.classList.remove('active'));
+
+                    // 현재 카드에 active 클래스 추가
+                    this.classList.add('active');
+
+                    // 스타일 또는 재질에 따라 프롬프트 텍스트 필드에 텍스트 추가
+                    const promptText = document.getElementById('feedbackPrompt');
+                    if (style) {
+                        prompt = `${style} 스타일로 변경해주세요`;
+                    } else if (material) {
+                        prompt = `${material} 재질로 변경해주세요`;
+                    }
+
+                    // 기존 텍스트가 있으면 줄바꿈 후 추가
+                    if (promptText.value.trim() !== '') {
+                        promptText.value += '\n' + prompt;
+                    } else {
+                        promptText.value = prompt;
+                    }
+                });
+            });
+
+            // 초기 이미지 로드
+            const previewImage = document.getElementById("designPreview");
+            const storedImage = localStorage.getItem("aiDesignImage");
+            if (storedImage) {
+                previewImage.src = storedImage;
+            }
+
+            // 페이지 이동 함수
+            window.goToPage = function() {
+                localStorage.setItem("aiDesignImage", previewImage.src);
+                window.location.href = "3_recommend.html";
+            }
+        });
+    </script>
+
+    <!-- 맞춤법 검사 스크립트 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const feedbackTextEl = document.getElementById("feedbackPrompt");
+            const resultBox = document.getElementById("spellResult");
+            const spellCheckBtn = document.getElementById("spellCheckBtn");
+            
+            spellCheckBtn.addEventListener("click", function() {
+                const text = feedbackTextEl.value;
+                if (!text.trim()) {
+                    alert("검사할 텍스트를 입력해주세요.");
+                    return;
+                }
+
+                // 결과 영역 표시 및 로딩 상태 표시
+                resultBox.classList.remove("hidden");
+                resultBox.textContent = "맞춤법 검사 중...";
+
+                fetch("https://2a64-219-240-96-223.ngrok-free.app/check", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: text })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        resultBox.innerHTML = `<span class="text-red-500">오류 발생: ${data.error}</span>`;
+                    } else {
+                        if (data.checked_text === text) {
+                            resultBox.innerHTML = `<span class="text-green-500">맞춤법 오류가 없습니다.</span>`;
+                        } else {
+                            resultBox.innerHTML = `
+                                <div class="mb-2 text-green-600 font-medium">맞춤법 교정 결과:</div>
+                                <div class="text-gray-700">${data.checked_text}</div>
+                            `;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("맞춤법 검사 실패:", error);
+                    resultBox.innerHTML = `<span class="text-red-500">맞춤법 검사에 실패했습니다.</span>`;
+                });
+            });
+        });
+    </script>
+
+    <!-- 피드백 제출 및 이미지 수정 요청 -->
+    <script>
+        document.getElementById("feedbackSubmit").addEventListener("click", async function() {
+            const prompt = document.getElementById("feedbackPrompt").value;
+            if (!prompt) {
+                alert("수정할 내용을 입력해주세요.");
+                return;
+            }
+            const imageUrl = document.getElementById("designPreview").src;
+            if (!imageUrl) {
+                alert("수정할 이미지가 없습니다.");
+                return;
+            }
+            try {
+                const imageResponse = await fetch(imageUrl);
+                if (!imageResponse.ok) {
+                    throw new Error("이미지 불러오기 실패");
+                }
+                const blob = await imageResponse.blob();
+                const file = new File([blob], "original.png", { type: "image/png" });
+                const formData = new FormData();
+                formData.append("original_image", file);
+                formData.append("prompt", prompt);
+                window.showLoading();
+                const response = await fetch("https://2a64-219-240-96-223.ngrok-free.app/edit-image", {
+                    method: "POST",
+                    body: formData
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "수정 요청 실패");
+                }
+                const data = await response.json();
+                if (data.result_url) {
+                    document.getElementById("designPreview").src = data.result_url;
+                    window.saveNewVersion(prompt, data.result_url);
+                } else {
+                    alert("결과 이미지가 없습니다.");
+                }
+            } catch (error) {
+                console.error("수정 요청 실패:", error);
+                alert("수정 요청에 실패했습니다: " + error.message);
+            } finally {
+                window.hideLoading();
+            }
+        });
+    </script>
+
+    <!-- 스타일/재질 선택 스크립트 정리 -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // 현재 날짜 설정
@@ -339,101 +480,17 @@
                 });
             });
             
-            // 버전 관리 시스템
-            let currentVersion = 1.0;
-            let versions = [];
-            
-            // 초기 이미지 로드 후 첫 버전 저장
+            // 초기 이미지 로드
             const previewImage = document.getElementById("designPreview");
+            const loadingIndicator = document.getElementById("loadingIndicator");
             const storedImage = localStorage.getItem("aiDesignImage");
             
             if (storedImage) {
                 previewImage.src = storedImage;
-                previewImage.onload = function() {
-                    // 첫 버전 저장
-                    saveVersion("초기 AI 디자인", storedImage);
-                };
             }
             
-            // 새 버전 저장 함수
-            function saveVersion(description, imageData) {
-                const versionNum = currentVersion.toFixed(1);
-                const versionDate = formattedDate;
-                
-                // 버전 데이터 생성
-                const version = {
-                    number: versionNum,
-                    date: versionDate,
-                    description: description,
-                    imageData: imageData
-                };
-                
-                // 버전 배열에 추가
-                versions.push(version);
-                
-                // UI 업데이트
-                updateVersionsList();
-                
-                // 버전 번호 증가
-                currentVersion += 0.1;
-                
-                // 현재 버전 표시 업데이트
-                document.getElementById('previewVersion').textContent = `현재 버전: v${versionNum}`;
-            }
-            
-            // 버전 목록 UI 업데이트
-            function updateVersionsList() {
-                const versionsList = document.getElementById('savedVersionList');
-                versionsList.innerHTML = '';
-                
-                // 최신 버전이 맨 위에 오도록 역순으로 표시
-                versions.slice().reverse().forEach(version => {
-                    const versionItem = document.createElement('div');
-                    versionItem.className = 'p-4 rounded-xl border-2 border-gray-100 hover:border-indigo-500 transition-all cursor-pointer saved-version';
-                    versionItem.innerHTML = `
-                        <div class="flex justify-between items-center mb-2">
-                            <p class="font-medium">버전 ${version.number}</p>
-                            <p class="text-sm text-gray-500">${version.date}</p>
-                        </div>
-                        <p class="text-sm text-gray-600">${version.description}</p>
-                    `;
-                    
-                    // 클릭 이벤트: 해당 버전의 이미지로 복원
-                    versionItem.addEventListener('click', function() {
-                        previewImage.src = version.imageData;
-                        document.getElementById('previewVersion').textContent = `현재 버전: v${version.number}`;
-                        document.getElementById('previewDate').textContent = `최종 수정: ${version.date}`;
-                    });
-                    
-                    versionsList.appendChild(versionItem);
-                });
-            }
-            
-            // 피드백 제출 성공 후 새 버전 저장을 위한 함수 전역으로 노출
-            window.saveNewVersion = function(description, imageData) {
-                saveVersion(description, imageData);
-            };
-        });
-
-        // 다음 페이지로 이동
-        function goToPage() {
-            const previewImage = document.getElementById("designPreview");
-            if (previewImage.src) {
-                localStorage.setItem("aiDesignImage", previewImage.src);
-            }
-            window.location.href = "3_recommend.html";
-        }
-    </script>
-    
-    <!-- 이미지 조작 관련 스크립트 -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const savePreviewButton = document.getElementById("savePreviewButton");
-            const sharePreviewButton = document.getElementById("sharePreviewButton");
-            const previewImage = document.getElementById("designPreview");
-            const loadingIndicator = document.getElementById("loadingIndicator");
-
             // 저장하기 버튼
+            const savePreviewButton = document.getElementById("savePreviewButton");
             savePreviewButton.addEventListener("click", function () {
                 if (!previewImage.src) return;
                 
@@ -451,8 +508,9 @@
                 link.click();
                 document.body.removeChild(link);
             });
-
+            
             // 공유하기 버튼
+            const sharePreviewButton = document.getElementById("sharePreviewButton");
             sharePreviewButton.addEventListener("click", async function () {
                 if (!previewImage.src) return;
                 
@@ -481,7 +539,7 @@
                     alert("이미지 공유에 실패했습니다.");
                 }
             });
-
+            
             // 로딩 표시 관리 함수
             window.showLoading = function() {
                 loadingIndicator.style.display = 'block';
@@ -493,110 +551,15 @@
                 previewImage.style.opacity = '1';
             }
         });
-    </script>
-    
-    <!-- 맞춤법 검사 스크립트 -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const feedbackTextEl = document.getElementById("feedbackPrompt");
-            const resultBox = document.getElementById("spellResult");
-            const spellCheckBtn = document.getElementById("spellCheckBtn");
-            
-            spellCheckBtn.addEventListener("click", function() {
-                const text = feedbackTextEl.value;
-                if (!text.trim()) {
-                    alert("검사할 텍스트를 입력해주세요.");
-                    return;
-                }
-                
-                // 결과 영역 표시 및 로딩 상태 표시
-                resultBox.classList.remove("hidden");
-                resultBox.textContent = "맞춤법 검사 중...";
-                
-                // URL 변경
-                fetch("https://2a64-219-240-96-223.ngrok-free.app/check", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: text })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        resultBox.innerHTML = `<span class="text-red-500">오류 발생: ${data.error}</span>`;
-                    } else {
-                        // 결과 표시
-                        if (data.checked_text === text) {
-                            resultBox.innerHTML = `<span class="text-green-500">맞춤법 오류가 없습니다.</span>`;
-                        } else {
-                            resultBox.innerHTML = `
-                                <div class="mb-2 text-green-600 font-medium">맞춤법 교정 결과:</div>
-                                <div class="text-gray-700">${data.checked_text}</div>
-                            `;
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error("맞춤법 검사 실패:", error);
-                    resultBox.innerHTML = `<span class="text-red-500">맞춤법 검사에 실패했습니다.</span>`;
-                });
-            });
-        });
-    </script>
-    
-    <!-- 피드백 제출 및 이미지 수정 요청 -->
-    <script>
-        document.getElementById("feedbackSubmit").addEventListener("click", async function() {
-            const prompt = document.getElementById("feedbackPrompt").value;
-            if (!prompt) {
-                alert("수정할 내용을 입력해주세요.");
-                return;
+        
+        // 페이지 이동 함수
+        function goToPage() {
+            const previewImage = document.getElementById("designPreview");
+            if (previewImage.src) {
+                localStorage.setItem("aiDesignImage", previewImage.src);
             }
-        
-            const imageUrl = document.getElementById("designPreview").src;
-            if (!imageUrl) {
-                alert("수정할 이미지가 없습니다.");
-                return;
-            }
-            
-            try {
-                const imageResponse = await fetch(imageUrl);
-                if (!imageResponse.ok) {
-                    throw new Error("이미지 불러오기 실패");
-                }
-                const blob = await imageResponse.blob();
-                const file = new File([blob], "original.png", { type: "image/png" });
-        
-                const formData = new FormData();
-                formData.append("original_image", file);
-                formData.append("prompt", prompt);
-        
-                window.showLoading();
-        
-                // URL 변경
-                const response = await fetch("https://2a64-219-240-96-223.ngrok-free.app/edit-image", {
-                    method: "POST",
-                    body: formData
-                });
-        
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || "수정 요청 실패");
-                }
-        
-                const data = await response.json();
-                if (data.result_url) {
-                    document.getElementById("designPreview").src = data.result_url;
-                    window.saveNewVersion(prompt, data.result_url);
-                } else {
-                    alert("결과 이미지가 없습니다.");
-                }
-            } catch (error) {
-                console.error("수정 요청 실패:", error);
-                alert("수정 요청에 실패했습니다: " + error.message);
-            } finally {
-                window.hideLoading();
-            }
-        });
+            window.location.href = "3_recommend.html";
+        }
     </script>
 </body>
 </html>
