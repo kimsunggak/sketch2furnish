@@ -62,20 +62,29 @@
                 </p>
             </div>
 
-            <!-- Dream Furniture Viewer Section -->
+            <!-- Dream Furniture Viewer Section 수정 - 업로드 영역 추가 -->
             <section class="mb-16">
                 <div class="grid lg:grid-cols-2 gap-8">
-                    <!-- Dream Furniture Viewer: Canvas 대신 img 요소 사용 -->
+                    <!-- Dream Furniture Viewer: 이미지 영역 -->
                     <div class="bg-white rounded-3xl p-8 shadow-lg flex flex-col h-full">
                         <div class="text-center mb-6">
                             <h3 class="text-xl font-bold gradient-text">Your Dream Furniture</h3>
                         </div>
-                        <div class="flex-grow flex justify-center items-center">
-                            <!-- img 요소로 URL 직접 표시 -->
+                        <div class="flex-grow flex justify-center items-center mb-4">
                             <img id="designPreview" src="" alt="Design Preview" class="rounded-xl w-full max-w-[710px] mx-auto">
                         </div>
+                        
+                        <!-- 이미지 업로드 영역 추가 -->
+                        <div class="mt-4 border-2 border-dashed border-indigo-300 rounded-xl p-4 text-center cursor-pointer hover:bg-indigo-50 transition-all" id="uploadArea">
+                            <svg class="w-8 h-8 mx-auto mb-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-sm text-gray-600 mb-1">새 이미지 업로드</p>
+                            <p class="text-xs text-gray-500">이미지를 끌어다 놓거나 클릭하세요</p>
+                            <input type="file" id="fileInput" accept="image/png,image/jpeg" class="hidden">
+                        </div>
                     </div>
-
+                    
                     <!-- Recommended Products -->
                     <div class="bg-white rounded-3xl p-8 shadow-lg flex flex-col h-full">
                         <div class="text-center mb-6">
@@ -149,6 +158,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const designPreview = document.getElementById('designPreview'); // 이미지 요소
     const applyPriceFilterButton = document.getElementById('applyPriceFilter');
     const recommendationsContainer = document.querySelector('.grid-cols-2');
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
     
     // localStorage에서 이미지 가져오기
     const storedImage = localStorage.getItem('aiDesignImage');
@@ -313,37 +324,43 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // 이미지 저장 버튼 (designPreview 이미지를 저장하도록 수정)
+    // 이미지 저장 버튼 (개선된 버전)
     document.getElementById("saveProjectButton").addEventListener("click", function() {
         try {
             if (!designPreview.src) {
                 throw new Error("저장할 이미지가 없습니다");
             }
             
-            // 임시 캔버스에 이미지 그린 후 PNG로 저장
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = designPreview.naturalWidth || 1024;
-            tempCanvas.height = designPreview.naturalHeight || 1024;
+            // URL로 시작하는 외부 이미지인 경우 (DALL-E 등)
+            if (designPreview.src.startsWith('http') && !designPreview.src.startsWith('data:')) {
+                // 새 창에서 이미지 열기
+                const win = window.open();
+                win.document.write(`
+                    <html>
+                        <head><title>이미지 저장</title></head>
+                        <body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;height:100vh;">
+                            <div style="text-align:center;">
+                                <img src="${designPreview.src}" style="max-width:90%;max-height:80vh;border:1px solid #ccc;">
+                                <p style="font-family:Arial;margin-top:20px;">
+                                    이미지에서 마우스 오른쪽 클릭 후 "이미지 저장"을 선택하세요.
+                                </p>
+                            </div>
+                        </body>
+                    </html>
+                `);
+                return;
+            }
             
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCtx.drawImage(designPreview, 0, 0, tempCanvas.width, tempCanvas.height);
-            
-            // 파일명 생성
-            const now = new Date();
-            const dateStr = now.toISOString().slice(0,10).replace(/-/g,'');
-            const timeStr = now.toTimeString().slice(0,8).replace(/:/g,'');
-            const fileName = `dream_furniture_${dateStr}_${timeStr}.png`;
-            
-            // 다운로드
-            const dataURL = tempCanvas.toDataURL('image/png', 1.0);
+            // data:image인 경우 (로컬에서 생성된 이미지)
+            const fileName = `dream_furniture_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.png`;
             const link = document.createElement('a');
-            link.href = dataURL;
+            link.href = designPreview.src;
             link.download = fileName;
-            
-            alert(`"${fileName}"로 이미지를 저장합니다.`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            alert(`"${fileName}" 파일로 저장되었습니다.`);
             
         } catch (error) {
             console.error("이미지 저장 오류:", error);
@@ -379,11 +396,84 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     
-    // 가격 필터 적용 버튼 이벤트
-    applyPriceFilterButton.addEventListener('click', requestRecommendations);
+    // 이미지 업로드 영역 이벤트 처리
+    uploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
     
-    // 파일 업로드 영역 이벤트 핸들러 (필요한 경우)
-    // ...기존 코드 유지...
+    // 파일 선택 시 이벤트
+    fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            handleUploadedFile(this.files[0]);
+        }
+    });
+    
+    // 드래그 앤 드롭 이벤트
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.classList.add('border-indigo-500');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.classList.remove('border-indigo-500');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.classList.remove('border-indigo-500');
+        
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleUploadedFile(e.dataTransfer.files[0]);
+        }
+    });
+    
+    // 업로드된 파일 처리 함수
+    function handleUploadedFile(file) {
+        if (!file.type.match('image.*')) {
+            alert('이미지 파일만 업로드 가능합니다.');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // 이미지 소스로 설정하고 localStorage에 저장
+            designPreview.src = e.target.result;
+            localStorage.setItem('aiDesignImage', e.target.result);
+            
+            // 알림 메시지
+            showNotification('이미지가 업로드되었습니다. 추천을 불러오는 중...');
+            
+            // 추천 요청 다시 실행
+            requestRecommendations();
+        };
+        reader.onerror = function() {
+            alert('파일을 읽는 중 오류가 발생했습니다.');
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // 알림 표시 함수
+    function showNotification(message) {
+        const existingNotification = document.getElementById('notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+        
+        const notification = document.createElement('div');
+        notification.id = 'notification';
+        notification.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white py-3 px-6 rounded-lg shadow-lg z-50 transition-opacity duration-300';
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    }
     
     // 페이지 초기화
     function initialize() {
