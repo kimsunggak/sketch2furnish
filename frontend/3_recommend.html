@@ -65,24 +65,14 @@
             <!-- Dream Furniture Viewer Section -->
             <section class="mb-16">
                 <div class="grid lg:grid-cols-2 gap-8">
-                    <!-- Dream Furniture Viewer -->
+                    <!-- Dream Furniture Viewer: Canvas 대신 img 요소 사용 -->
                     <div class="bg-white rounded-3xl p-8 shadow-lg flex flex-col h-full">
                         <div class="text-center mb-6">
                             <h3 class="text-xl font-bold gradient-text">Your Dream Furniture</h3>
                         </div>
-                        <div class="flex-grow">
-                            <!-- 캔버스가 1:1 비율로 확대되어 나타납니다. -->
-                            <canvas id="viewerCanvas" class="w-full bg-gray-200 rounded-xl mb-4" style="aspect-ratio: 1 / 1;"></canvas>
-                            
-                            <!-- 파일 업로드 영역 추가 -->
-                            <div class="mt-4 border-2 border-dashed border-indigo-300 rounded-xl p-4 text-center cursor-pointer hover:bg-indigo-50 transition-all" id="uploadArea">
-                                <svg class="w-8 h-8 mx-auto mb-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                                </svg>
-                                <p class="text-sm text-gray-600 mb-1">PNG 이미지 업로드 후 다시 추천받기</p>
-                                <p class="text-xs text-gray-500">이미지를 끌어다 놓거나 클릭하세요</p>
-                                <input type="file" id="fileInput" accept="image/png,image/jpeg" class="hidden">
-                            </div>
+                        <div class="flex-grow flex justify-center items-center">
+                            <!-- img 요소로 URL 직접 표시 -->
+                            <img id="designPreview" src="" alt="Design Preview" class="rounded-xl w-full max-w-[710px] mx-auto">
                         </div>
                     </div>
 
@@ -160,6 +150,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const applyPriceFilterButton = document.getElementById('applyPriceFilter');
     const recommendationsContainer = document.querySelector('.grid-cols-2');
     const storedImage = localStorage.getItem('aiDesignImage');
+    const previewImage = document.getElementById("designPreview");
+    
+    // 만약 저장된 이미지가 URL 형식이면 바로 src에 할당
+    if (storedImage && storedImage.startsWith("http")) {
+        previewImage.src = storedImage;
+    }
     
     // 로딩 상태 UI 컴포넌트
     function showLoading() {
